@@ -1,0 +1,1228 @@
+# Rshiny ideas from on https://gallery.shinyapps.io/multi_regression/
+# fda budesonide bioequivalence 
+
+library(shiny)
+library(nlme)
+library(VCA)
+library(knitr)
+require(VCA)
+library(shinythemes)
+options(max.print=1000000)
+fig.width <- 1200
+fig.height <- 450
+p1 <- function(x) {formatC(x, format="f", digits=1)}
+
+
+
+####
+
+lines <- c("1 31 B REF 5.957211 1 31 M REF 5.961802 1 31 E REF 5.967178 1 32 B REF 6.010251 1 32 M REF 6.004711 1 32 E REF 6.004797 1 33 B REF 5.884161 1 33 M REF 5.894085 1 33 E REF 5.895977 1 34 B REF 5.624705 1 34 M REF 5.632991 1 34 E REF 5.614428 1 35 B REF 5.957329 1 35 M REF 5.966059 1 35 E REF 5.968143 1 36 B REF 5.074298 1 36 M REF 5.063063 1 36 E REF 5.058519 1 37 B REF 5.418587 1 37 M REF 5.420591 1 37 E REF 5.418178 1 38 B REF 6.325178 1 38 M REF 6.321954 1 38 E REF 6.303148 1 39 B REF 5.656286 1 39 M REF 5.68025 1 39 E REF 5.675036 1 40 B REF 5.792299 1 40 M REF 5.775161 1 40 E REF 5.793083 2 41 B REF 5.601033 2 41 M REF 5.611223 2 41 E REF 5.601142 2 42 B REF 5.61553 2 42 M REF 5.587412 2 42 E REF 5.591004 2 43 B REF 5.682466 2 43 M REF 5.676472 2 43 E REF 5.671434 2 44 B REF 5.844336 2 44 M REF 5.855172 2 44 E REF 5.862329 2 45 B REF 5.898151 2 45 M REF 5.883657 2 45 E REF 5.878956 2 46 B REF 6.100662 2 46 M REF 6.105463 2 46 E REF 6.108098 2 47 B REF 6.294753 2 47 M REF 6.28534 2 47 E REF 6.302333 2 48 B REF 5.638072 2 48 M REF 5.627372 2 48 E REF 5.623516 2 49 B REF 5.113562 2 49 M REF 5.122454 2 49 E REF 5.109271 2 50 B REF 5.932752 2 50 M REF 5.913438 2 50 E REF 5.912427 3 51 B REF 5.961947 3 51 M REF 5.955332 3 51 E REF 5.943721 3 52 B REF 6.2334 3 52 M REF 6.250689 3 52 E REF 6.219668 3 53 B REF 6.041431 3 53 M REF 6.038234 3 53 E REF 6.080464 3 54 B REF 6.049713 3 54 M REF 6.039759 3 54 E REF 6.054218 3 55 B REF 6.834563 3 55 M REF 6.85264 3 55 E REF 6.857395 3 56 B REF 4.864966 3 56 M REF 4.907521 3 56 E REF 4.891049 3 57 B REF 5.895176 3 57 M REF 5.885851 3 57 E REF 5.874895 3 58 B REF 6.45826 3 58 M REF 6.443113 3 58 E REF 6.435882 3 59 B REF 6.090533 3 59 M REF 6.102835 3 59 E REF 6.077606  3 60 B REF 5.886724 3 60 M REF 5.920949 3 60 E REF 5.915749 4 1 B TEST 6.894594 4 1 M TEST 6.913011 4 1 E TEST 6.895764 4 2 B TEST 5.832334 4 2 M TEST 5.846562 4 2 E TEST 5.832269 4 3 B TEST 6.235755 4 3 M TEST 6.26231 4 3 E TEST 6.245095 4 4 B TEST 5.646185 4 4 M TEST 5.635887 4 4 E TEST 5.63034 4 5 B TEST 5.960711 4 5 M TEST 5.962902 4 5 E TEST 5.961959 4 6 B TEST 5.500354 4 6 M TEST 5.508444 4 6 E TEST 5.513115 4 7 B TEST 6.663099 4 7 M TEST 6.64733 4 7 E TEST 6.651215 4 8 B TEST 5.724774 4 8 M TEST 5.72086 4 8 E TEST 5.71411 4 9 B TEST 6.183375 4 9 M TEST 6.186433 4 9 E TEST 6.182109 4 10 B TEST 5.64053 4 10 M TEST 5.648589 4 10 E TEST 5.626395 5 11 B TEST 6.69764 5 11 M TEST 6.71128 5 11 E TEST 6.699829 5 12 B TEST 6.555609 5 12 M TEST 6.549935 5 12 E TEST 6.551611 5 13 B TEST 5.009683 5 13 M TEST 5.013969 5 13 E TEST 5.010928 5 14 B TEST 5.440976 5 14 M TEST 5.42057 5 14 E TEST 5.447687 5 15 B TEST 6.477609 5 15 M TEST 6.456082  5 15 E TEST 6.448981 5 16 B TEST 6.442601 5 16 M TEST 6.426217 5 16 E TEST 6.436262 5 17 B TEST 5.640496 5 17 M TEST 5.63846 5 17 E TEST 5.640755 5 18 B TEST 6.597718 5 18 M TEST 6.599232 5 18 E TEST 6.609437 5 19 B TEST 6.007241 5 19 M TEST 5.990695 5 19 E TEST 5.984292 5 20 B TEST 6.781806 5 20 M TEST 6.774386 5 20 E TEST 6.784001 6 21 B TEST 5.993852 6 21 M TEST 5.994287 6 21 E TEST 5.993541 6 22 B TEST 6.012322 6 22 M TEST 6.006182 6 22 E TEST 6.017961 6 23 B TEST 5.965969 6 23 M TEST 5.97125 6 23 E TEST 5.967839 6 24 B TEST 5.592609 6 24 M TEST 5.581154 6 24 E TEST 5.588877 6 25 B TEST 6.002182 6 25 M TEST 6.011583 6 25 E TEST 6.018746 6 26 B TEST 5.267014 6 26 M TEST 5.272291 6 26 E TEST 5.265213 6 27 B TEST 5.766104 6 27 M TEST 5.786727 6 27 E TEST 5.773194 6 28 B TEST 6.054975 6 28 M TEST 6.05232 6 28 E TEST 6.061088 6 29 B TEST 5.838689 6 29 M TEST 5.837566 6 29 E TEST 5.842508 6 30 B TEST 5.784255 6 30 M TEST 5.789891 6 30 E TEST 5.788662")
+con <- textConnection(lines)
+cnames <- c("BATCH","SECTOR","REP","PRODUCT","y")
+fda <- read.table(con, col.names=cnames)
+close(con)
+
+#####
+bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
+                    response="ISM",indep="CONTAIN", split="PRODUCT", ref="REF", test="TEST"
+                    
+) {
+    
+    mydata<- foo1
+    
+    # constants
+    thetap = ((log(1.11))^2 +0.01)/(0.1)^2 #2.0891, reg constant
+    sigma_TO = 0.1
+    alpha=.05
+    
+    # denominator
+    denom <- nrXlr*mr
+    denom2 <- ntXlt*mt
+    
+    # create a dataset, log the response
+    mydata <- as.data.frame(mydata)
+    mydata$Container <- as.factor(mydata[,indep])
+    mydata$y <- mydata[,response]
+    mydata$Product <- mydata[,split]
+    mydata$y <- log(mydata$y)
+    
+    # create a slim dataset
+    tmp <- mydata
+    foo <- mydata[, c("Product", "Container", "y", "SECTOR")]
+    mydata<- foo
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    # print and plot the data
+    tmp <- tmp[, c("Product", "Container", "y", "SECTOR", "BATCH")]
+    #cat("\nListing of the data\n ")
+    tmp$indep.var <- (tmp$y)
+    #print(plyr::arrange(tmp, Product, BATCH, Container, SECTOR, y, indep.var))
+    
+    #cat("\nPlot the data\n")
+    
+   
+    
+    # plot1 <- varPlot(y~Product /BATCH/Container/SECTOR, tmp,
+    #                  BG=list(var="Container",
+    #                          col=c("#f7fcfd", "#99d8c9"), col.table=FALSE),
+    #                  MeanLine=list(var="Product", col="blue", lwd=1, lty="dotted"),
+    #                  YLabel=list(font=2, col="black", cex=1, text= paste0("log ",response))
+    # )
+    # 
+    # (plot1)
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~STUDY DESIGN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #Analysis on the test data
+    cat("\n~~~~~~~~~~~~~~~~~~~~Test Product ANOVA~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    x <- as.data.frame(mydata)
+    foo <- x[x$Product %in% test,]
+    print(test <- VCA::anovaVCA(y~Container, foo))
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~test anova~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    x.barT <- mean(foo$y)  
+    TANOVA <- anova(lm(y~Container, foo)) 
+    TMSB <- TANOVA["Container","Mean Sq"] 
+    TMSW <- TANOVA["Residuals","Mean Sq"] 
+    
+    if (test$NegVCmsg %in% "* VC set to 0") {
+        
+        SIGMAT <- sqrt(TMSW) # Should use this if between is zero
+        
+        test.between = 0
+        test.note <- "test: the between variance component was set to zero"
+    } else {
+        
+        SIGMAT <- ( TMSB/mt + ((mt-1)*TMSW)/mt )^.5
+        
+        test.between = 1
+        test.note <- "test: the between variance component was measurable"
+    }
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #Analysis on the reference data
+    cat("\n~~~~~~~~~~~~~~~~~~Reference Product ANOVA~~~~~~~~~~~~~~~~~~~~~\n")
+    x <- as.data.frame(mydata)
+    foo <- x[x$Product %in% ref,]
+    print(ref <- VCA::anovaVCA(y~Container, foo))
+    x.barR <- mean(foo$y)
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~ref anova~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    RANOVA <- anova(lm(y~Container, foo)) 
+    RMSB <- RANOVA["Container","Mean Sq"] 
+    RMSW <- RANOVA["Residuals","Mean Sq"] 
+    
+    if (ref$NegVCmsg %in% "* VC set to 0") {
+        
+        SIGMAR <- sqrt(RMSW) # Should use this if between is zero
+        ref.note <- "ref: the between variance component was set to zero"
+        ref.between = 0
+        
+    } else {
+        
+        SIGMAR <- ( RMSB/mr + ((mr-1)*RMSW)/mr )^.5 # 
+        ref.between = 1
+        ref.note <- "ref: the between variance component was measurable"
+        
+    }
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Perform analysis
+    D <- TMSW/denom2 # within test
+    A <- TMSB/denom2 # between test
+    E <- RMSW/denom  # within ref
+    B <- RMSB/denom  # between ref
+    
+    rmsb  <- RMSB
+    rmsbw <- RMSW
+    msb   <- TMSB
+    msbw  <- TMSW
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # perform the calculations
+    E1b <- (rmsb - 0)/mr # between-container variability for ref product
+    ED <- (x.barR - x.barT)^2 # mean diff squared
+    
+    if (test.between %in% 0) {
+        
+        E1 <- 0 
+        E2 <- msbw 
+        E3s <- 0 
+        E4s <- -(1+thetap)* rmsbw 
+        
+    } else if (test.between %in% 1) {
+        
+        E1 <- (msb - 0)/mt 
+        E2 <- (mt-1)*msbw/mt
+        E3s <- -(1+thetap)* E1b
+        E4s <- -(1+thetap)* (mr-1)*rmsbw/mr
+        
+    }
+    
+    EQ <- ED + E1 + E2 + E3s + E4s
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Here is where we should adjust the analysis based on negative variance components..but we do not adjust based on customer request
+    # this remains constant, if a variance component is zero the effect is not taken into account.
+    DFTN0 <- (ntXlt-1)
+    DFRN0 <- (nrXlr-1)
+    DFT0 <-  (ntXlt*(mt-1))
+    DFR0 <-  (nrXlr*(mr-1))
+    
+    if (test.between %in% 1 & ref.between %in% 1) {
+        
+        get.df <- DFTN0 + DFRN0 ; se <- sqrt( A + B ) 
+        
+    } else if (test.between %in% 0 & ref.between %in% 0) {
+        
+        get.df <- DFT0 + DFR0 ; se <- sqrt( D + E ) 
+        
+    } else if (test.between %in% 0 & ref.between %in% 1) {
+        
+        get.df <- DFT0 + DFRN0 ; se <- sqrt( D + B ) 
+        
+    } else if (test.between %in% 1 & ref.between %in% 0) {
+        
+        get.df <- DFR0 + DFTN0 ; se <- sqrt( E + A ) 
+        
+    }
+    
+    (HD <- (abs(ED^0.5) + qt(1-alpha, df=get.df) * se )^2)
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    H1 <-  (DFTN0*E1) /  qchisq(alpha,   DFTN0)
+    H2 <-  (DFT0*E2)  /  qchisq(alpha,   DFT0)
+    H3s <- (DFRN0*E3s)/  qchisq(1-alpha, DFRN0)
+    H4s <- (DFR0*E4s) /  qchisq(1-alpha, DFR0)
+    
+    UD = (HD-ED)^2
+    U1 = (H1-E1)^2
+    U2 = (H2-E2)^2
+    U3s= (H3s-E3s)^2
+    U4s= (H4s-E4s)^2
+    
+    Hmu1 <- EQ + (UD + U1 + U2 + U3s + U4s)^0.5
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # constant scale calcs, point estimates
+    
+    if (ref.between %in% 0) {
+        
+        E3c <- 0  
+        E4c <- -rmsbw  
+        
+    } else if (ref.between %in% 1) {
+        
+        E3c <- - E1b    
+        E4c <- - (mr-1)*rmsbw/mr
+        
+    }
+    
+    EQc <- ED + E1 + E2 + E3c + E4c - thetap* sigma_TO^2
+    
+    DFTN0 <- (ntXlt-1)
+    DFRN0 <- (nrXlr-1)
+    DFT0 <-  (ntXlt*(mt-1))
+    DFR0 <-  (nrXlr*(mr-1))
+    
+    # Constant scaled calculations, confidence bounds
+    
+    H3c <- (DFRN0*E3c)/  qchisq(0.95, DFRN0)
+    H4c <- (DFR0*E4c) /  qchisq(0.95, DFR0)
+    U3c <- (H3c-E3c)^2 
+    U4c <- (H4c-E4c)^2 
+    
+    # Constant scaled 95% upper confidence bound (Hmu2)
+    
+    Hmu2 <-EQc + (UD + U1 + U2 + U3c + U4c)^0.5
+    
+    #Conclusion
+    
+    # print all key results for cross checking
+    rel <- c(response, indep, nrXlr , mr , ntXlt , mt ,
+             x.barR, x.barT, x.barT-x.barR,
+             SIGMAR, SIGMAT, SIGMAT/SIGMAR,
+             exp(x.barR), exp(x.barT), exp(x.barT)/exp(x.barR), 
+             HD, EQ, Hmu1)
+    
+    rel <- (as.data.frame(rel))
+    con <- c(rep("-",16),EQc, Hmu2)
+    con <- (as.data.frame(con))
+    res <- cbind(rel, con)
+    
+    rownames(res) <- c("Response variable (logged for analysis)", 
+                       "ANOVA independent variable",
+                       "containers x no of batches, ref",
+                       "reps in ref containers", 
+                       "containers x no of batches, test",
+                       "reps in test containers",
+                       "Mean of the logged ref", 
+                       "Mean of the logged test", 
+                       "Mean log test-Mean log ref",
+                       "Sigma total log reference (SigmaR)",
+                       "Sigma total log test",
+                       "Sigma total log test/log reference",
+                       "GM ref", "GM test", 
+                       "GM ratio T/R",
+                       "HD", 
+                       "Point Est." ,
+                       "Upp 95%CI scale")
+    
+    if (SIGMAR > sigma_TO) {
+        colnames(res) <- c("relative scale, use this for inference","constant scale")
+    } else {
+        colnames(res) <- c("relative scale","constant scale, use this for inference")
+    }
+    
+    print(kable(res))
+    
+    
+    cat("\n")
+    print(test.note); print(ref.note)
+    cat("\n")
+    
+    accept="FAIL"
+    
+    if (SIGMAR > sigma_TO) {
+        
+        if (Hmu1 < 0) {accept="PASS"} else {accept="FAIL"}
+        result1 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQ, Hmu1, accept))
+        names(result1) <- c("Total SD Reference", " FDA constant", " linearized ref. scale point estimate", " upper 95% conf band", " upper 95% conf band <0?")
+        # cat("\nTest ANOVA\n")
+        # print(TANOVA)
+        # cat("\nReference ANOVA\n")
+        # print(RANOVA)
+        # cat("\nGeometric mean reference\n")
+        # print(exp(x.barR))
+        # cat("\nGeometric mean test\n")
+        # print(exp(x.barT))
+        # cat("\nRatio of Geom Means (T/R)\n")
+        # print(exp(x.barT)/ exp(x.barR))
+        cat("~~~~~~~~~~~~~~~~Referenced Scaled Approach as SigmaR > 0.1~~~~~~~~~~~~~~")
+        print(kable(result1, digits=12))
+        
+    } else {
+        
+        if (Hmu2 < 0) {accept="PASS"} else {accept="FAIL"} 
+        result2 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQc, Hmu2, accept))
+        names(result2) <- c("Total SD Reference", " FDA constant", " linearized const. scale point estimate", " upper 95% conf band", " upper 95% conf band <0?")
+        # cat("\nTest ANOVA\n")
+        # print(TANOVA)
+        # cat("\nReference ANOVA\n")
+        # print(RANOVA)
+        # cat("\nGeometric mean reference\n")
+        # print(exp(x.barR))
+        # cat("\nGeometric mean test\n")
+        # print(exp(x.barT))
+        # cat("\nRatio of Geom Means (T/R)\n")
+        # print(exp(x.barT)/ exp(x.barR))
+        cat("~~~~~~~~~~~~~~~~Constant Scaled Approach as SigmaR <= 0.1~~~~~~~~~~~~~~")
+        print(kable(result2, digits=12))
+        
+    }
+    
+
+    #return(kable(res))
+    
+}
+
+
+#####
+
+
+
+ui <-
+    
+    fluidPage(theme = shinytheme("journal"),
+              
+               
+    shinyUI(pageWithSidebar(
+            
+            
+           # ( # closed
+        
+      
+    headerPanel("FDA Bioequivalence Budesonide Guidance: statistical approach"),
+    
+              sidebarPanel(
+        
+        
+        div(p("Using R we perform the FDA Bioequivalence guidance evaluation (when there are n>1 replicates in 'containers'), FDA Guiudance at the following link:")),  
+        tags$a(href = "https://www.accessdata.fda.gov/drugsatfda_docs/psg/Budesonide_Inhalation_Sus_20929_RC_09-12.pdf", "FDA Bioequivalence Budesonide guidance"),
+        div(p(" ")),
+        div(p("We simulate data and analyse and we also analyse the FDA guidance example replicating the guidance results. Also there is an option to upload your own data for analysis. A choice of plots is given, a base plot or a plot using the VCA package. A choice of modelling is given only for the first tab using nlme or VCA package. The difference in the two is in the variance components confidence interval calculations.")),
+        
+        div(
+            
+            #p("blah"),
+            selectInput("Plot",
+                        strong("Select plot preference "),
+                        choices=c("VCA package plot" , "Base plot")),
+            
+            
+            selectInput("Model",
+                        strong("Select modelling preference "),
+                        choices=c("VCA package" , "nlme package")),
+            
+            
+            actionButton("resample", "Simulate a new sample"),
+            br(),br(),
+            div(strong("Tab 1a Plot and variance components analysis - simulated data")),p("Does just that, plot a balanced design based on the user inputs below"),
+            div(strong("Tab 1b Bioequivalence - simulated data")),p("Performs the analysis approach based on guidance, but will adjust analysis if negative variance components are encountered. Presents a one way ANOVA on each product, performs PBS analysis and then concludes in a PASS or FAIL"),
+            div(strong("Tab 1c List the simulated data")),p("A simple listing of the simulated data."),
+            div(strong("Tab 2a Plot - FDA data")),p("The example FDA datset is plotted"),
+            div(strong("Tab 2b Bioequivalence FDA data")),p("Reproduces the FDA analysis as presented in the guidance, notice differences in decimal places."),
+            div(strong("Tab 2c List the FDA data")),p("A simple listing of the FDA example data."),
+            div(strong("Tab 3 Notes")),p("An explanation of the analysis"),
+            div(strong("Tab 4 User data")),p("User data can be loaded. PBE analysis takes place, the data plotted and listed. It does not have to be balanced, though it requires a balanced number of replicates within each product. The program will work out the design"),
+
+            
+            
+            
+            
+            div(strong("Select true population parameters for simulated data (tabs 1a-1c only)"),
+            
+            
+            p("A 3 level nested data set is simulated. A plot of the raw data is generated. 
+                  A model is fit to estimate the variance components. If the design is not balanced the FDA proposed analysis will not work. For the base plot, the blue dashed lines demark the top level groups. The green dashed lines demark the mid level groups.
+                  The boxplots within the green lines demark the lowest level groups. Each boxplot presents the distribution of replicates. The middle, lowest and replicate numbers are varied randomly based on the slider ranges. The variance components are between blue 'top' groups,
+between green 'mid' groups (within blue groups), within green 'mid' groups, within 'low' groups (replicates), aka repeatability. So we actually estimate 4 components counting the residual error. Create a balanced design by reducing all the sliders to one value. The FDA guidance fits a one way ANOVA to each product data and the independent variable is the lowest level. The mid level 'batch' is not included in the analysis, however the degrees of freedom are adjusted. The guidance does not discuss how to proceed in the case that a between variance component is estimated as negative, that's a bit Pepega, we show what to do in those scenarios, see notes tab for more information.
+
+                  
+                  You also have the choices of selecting a new sample. ")),
+            
+            
+            br(),
+            actionButton(inputId='ab1', label="R code here", 
+                         icon = icon("th"), 
+                         onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis/master/three-level-nested-variance-components-analysis/app.R', '_blank')"),
+            
+            br(),
+            br(),
+            #p(strong("Generate true population parameters:")),   
+            sliderInput("intercept",
+                        "True intercept",
+                        min=0, max=1000, step=.5, value=700, ticks=FALSE),
+            
+            sliderInput("top",
+                        "Number of levels of top component (demarked by blue or thick lines)",
+                        min=2, max=100, step=1, value=2, ticks=FALSE),
+
+            sliderInput("range1", "Middle level: select no. of 'mid' groups within each top level group:", 
+                        min = 2, max = 10, step=1, value = c(3,3), ticks=FALSE) ,
+            
+            sliderInput("range2", "Lower level: select\n no. of 'low' groups within each mid level group:",
+                        min = 2, max = 10, step=1, value = c(10,10),ticks=FALSE),
+            
+            sliderInput("replicates", "select number of replicates nested within each boxplot",
+                        min = 2, max = 50, step=1, value = c(3,3), ticks=FALSE),
+            
+            sliderInput("a",
+                        "True top level SD",
+                        min=1, max=100, step=.5, value=75, ticks=FALSE),
+            sliderInput("b",
+                        "True middle level SD",
+                        min=1, max=100, step=.5, value=1, ticks=FALSE),
+            sliderInput("c",
+                        "True lower level SD",
+                        min=1, max=100, step=.5, value=1, ticks=FALSE),
+            sliderInput("d",
+                        "True error",
+                        min=1, max=100, step=.5, value=75, ticks=FALSE)
+            
+))
+    ,  
+       
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~tab panels
+    mainPanel(
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~start of section to load in data, https://shiny.rstudio.com/articles/upload.html
+        # and this https://stackoverflow.com/questions/44222796/shiny-with-multiple-tabs-and-different-sidebar-in-each-tab
+       # tabsetPanel(type = "tabs", 
+        
+       
+
+                    navbarPage(       
+                        
+             
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+                   
+                        
+                        tags$style(HTML(" 
+                   
+                  
+         .navbar-default .navbar-brand {color: cyan;}
+        .navbar-default .navbar-brand:hover {color: blue;}
+        .navbar { background-color: lightgrey;}
+        .navbar-default .navbar-nav > li > a {color:black;}
+        .navbar-default .navbar-nav > .active > a,
+        .navbar-default .navbar-nav > .active > a:focus,
+        .navbar-default .navbar-nav > .active > a:hover {color: pink;background-color: purple;}
+        .navbar-default .navbar-nav > li > a:hover {color: black;background-color:yellow;text-decoration:underline;}
+        .navbar-default .navbar-nav > li > a[data-value='t1'] {color: red;background-color: pink;}
+        .navbar-default .navbar-nav > li > a[data-value='t2'] {color: blue;background-color: lightblue;}
+        .navbar-default .navbar-nav > li > a[data-value='t3'] {color: green;background-color: lightgreen;}
+                   ")), 
+                  
+                    
+                    ##~~~~~~~~~~~~~~~~~~~~~end of section to load in data
+             
+                    #~~~~~~~~~~~~          
+                    tabPanel("1a Plot and variance components analysis - simulated data", 
+                             
+                             div(plotOutput("reg.plot", width=fig.width, height=fig.height)),  
+                             
+                             p(strong("Model output: arithmetic mean presented above plot when VCA is used otherwise modelled mean
+                 (artithmetic mean and modelled mean will match with a balanced design)")) ,
+                             
+                             div( verbatimTextOutput("reg.summary"))
+                             
+                    ) ,
+                    #~~~~~~~~~~~~
+                   
+                    #~~~~~~~~~~~~
+                    tabPanel("1b Bioequivalence - simulated data", 
+                             
+                            div( verbatimTextOutput("bioequiv0")),
+                             
+                             p(strong(""))
+                       
+                    ) ,
+                    #~~~~~~~~~~~~~
+                    tabPanel("1c List the simulated data", 
+                             
+                             div( verbatimTextOutput("summary2")),
+                             
+                             p(strong("copy the above data to do your own analysis................."))
+                             
+                    ) ,
+                    #~~~~~~~~~~~~~~~~~~
+                    tabPanel("2a Plot - FDA data", 
+                             
+                             div(plotOutput("reg.plot2", width=fig.width, height=fig.height)),  
+                             
+                             p(strong("Model output: arithmetic mean presented above plot when VCA is used otherwise modelled mean
+                 (artithmetic mean and modelled mean will match with a balanced design)")) 
+                              
+                             
+                    ) ,
+                    #~~~~~~~~~~~~          
+                    tabPanel("2b Bioequivalence FDA data", 
+                             
+                             div( verbatimTextOutput("bioequivfda1")) #
+                             
+                           #  p(strong(""))
+                             
+                    ) ,
+                    #~~~~~~~~~~~~~
+                    tabPanel("2c List the FDA data", 
+                             
+                             div( verbatimTextOutput("summary3")),
+                             
+                             p(strong("copy the above data to do your own analysis................."))
+                             
+                    ),
+                    #~~~~~~~~~~~~~~~~~~
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    
+                    tabPanel("3 Notes", value=3, #h3("Some notes and a further reference"),
+                              p('When the between variance components are estimted to be negative we apply the following adjustments. 
+                                to do Explain all the tabs/ upload your own data?/ this page/stats at top of fda graph...dont allow unbalanced?'),
+                             p("Sometimes the mean square between (MSB) is less than the mean square within (MSW), resulting in a negative estimate for the between variance component. 
+                             Thus concluding there is no additional variability due to the between variance component. In such cases the FDA PBE equations are then adjusted. We have m replicates, 
+                             n items per batch and l is the no batches per product (test and reference). The FDA guideance document states that:"),
+                              br(),
+                              
+                             withMathJax(
+                                 helpText('
+                           $${{\\sigma_R = }{\\sqrt{\\frac{MSB_R}{m} + \\frac{(m-1)MSW_R}{m}}}}\\!$$')),  #{\\left({\\mu,\\thinspace\\sigma^2}\\right)} \\frac{1}{2}
+                             
+                              withMathJax(
+                                  helpText('This is equal to   $${{}\\sigma_R ={\\sqrt{\\frac{MSB_R-MSW_R}{m} + MSW_R}}}\\!$$ In the event that $$MSB_R < MSW_R$$then $$MSB_R - MSW_R < 0$$and therefore $$\\sigma_R <  {\\sqrt{MSB_W}}$$
+                              This means the total variance is less than the within variance component which cannot be. If this is encountered the the total variance is set equal to the within variance component.  For either or both reference or test product id necessary. This is the first change from the guidance.')),
+                                        #   $${{}\\sigma_R ={\\sqrt{\\frac{MSB_R-MSW_R}{m} + MSW_R}}}\\!$$')),   #   $${{Y}\\sim{LN}}{\\left({\\mu,\\thinspace\\sigma^2}\\right)}\\!$$')),
+                              
+                              withMathJax(
+                                  helpText('then, 
+                               $${{log(Y)}\\sim{N}}{\\left({\\mu,\\thinspace\\sigma^2}\\right)}\\!$$')),
+                              
+                              withMathJax(
+                                  helpText('We wish to know, 
+                               $${ \\sim{N} \\left({\\mu,\\thinspace\\sigma^2}\\right)}\\!$$')),
+                              
+                              helpText('Let\'s calculate the normal distribution parameters,$${ \\phi =sqrt({\\sigma^2}+{\\mu^2}  )}\\!$$') ,
+                              
+                              helpText('$${ \\mu =log({\\mu^2}/{\\phi}  )}\\!$$') ,
+                              
+                              helpText('$${ \\sigma = sqrt(log({\\phi^2}/{\\mu^2}  ))}\\!$$',
+                                       
+                                       'Now let\'s revert back to log-normal distribution parameters,
+                                                $${ \\mu = \\exp({\\mu}+{0.5\\sigma^2}  )}\\!$$'),
+                              
+                              helpText('
+                                                $${ \\sigma = {\\mu}({sqrt(\\exp(\\sigma^2)-1)}  )}\\!$$'),
+                              
+                              helpText('Alternative equivalent parameterisation of sigma...
+                                                $${ \\sigma = sqrt(\\exp(2\\mu+\\sigma^2) (\\exp(\\sigma^2)-1)  )}\\!$$'),
+                              
+                              
+                              br(),
+                              tags$a(href = "https://blogs.sas.com/content/iml/2014/06/04/simulate-lognormal-data-with-specified-mean-and-variance.html", "Blog on simulating lognormal data"),
+                              br(),
+                              br(),
+                              br()),
+                    
+                    
+                    
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                   
+                    tabPanel("4 User data", fluid = TRUE,
+                             
+                             
+                             p(("Upload your own data for determination of PBE equivalence. Please prepare an input file with the names 'BATCH'	'SECTOR' 'REP' 'PRODUCT' and 'y', see the FDA tab listing example. The top two radio buttons options are to help load, the bottom two options are to swap between analysis and a plot. Ensure your data is balanced. Once uploaded, toggle between the 'analysis' and 'output' radio buttons.)")) ,
+                             sidebarLayout(
+                               
+                               # Sidebar panel for inputs ----
+                               sidebarPanel(
+                                 
+                                 # Input: Select a file ----
+                                 fileInput("file1", "Choose CSV File",
+                                           multiple = TRUE,
+                                           accept = c("text/csv",
+                                                      "text/comma-separated-values,text/plain",
+                                                      ".csv")),
+                                 
+                                 # Horizontal line ----
+                                 tags$hr(),
+                                 
+                                 # Input: Checkbox if file has header ----
+                                 checkboxInput("header", "Header", TRUE),
+                                 
+                                 # Input: Select separator ----
+                                 radioButtons("sep", "Separator",
+                                              choices = c(Comma = ",",
+                                                          Semicolon = ";",
+                                                          Tab = "\t",
+                                                          Whitespace = ""),
+                                              selected = ""),
+                                 
+                                 # Input: Select quotes ----
+                                 radioButtons("quote", "Quote",
+                                              choices = c(None = "",
+                                                          "Double Quote" = '"',
+                                                          "Single Quote" = "'"),
+                                              selected = ''),
+                                 
+                                 # Horizontal line ----
+                                 tags$hr(),
+                                 
+                                 # Input: Select number of rows to display ----
+                                 radioButtons("disp", "Display",
+                                              choices = c(Head = "head",
+                                                          All = "all"),
+                                              selected = "head"),
+                                 
+                                 # Horizontal line ----
+                                 tags$hr(),
+                                 
+                                 # Input: Select number of rows to display ----
+                                 radioButtons("what", "Output",
+                                              choices = c(Analysis = "Analysis",
+                                                          Plot = "plot"),
+                                              selected = "Analysis")
+                                 
+                               ),
+                               
+                               # Main panel for displaying outputs ----
+                               mainPanel(
+                                 
+                                 # Output: Data file ----
+                                 
+                                 
+                                 div(verbatimTextOutput("contents2")),
+                                 plotOutput("plotx"),
+                                 tags$hr(),
+                                 
+                                 tableOutput("contents") 
+                                 
+                                 
+                               ),
+                               
+                             
+                             )) )
+                    )
+    ) ))
+        #~~~~~~~~~~~~~~~~~~~~~~~
+        
+        #~~~~~~~~~~~~~
+    
+
+
+
+server <- shinyServer(function(input, output) {
+    
+    # --------------------------------------------------------------------------
+    # This is where a new sample is instigated only random noise is required to be generated
+    random.sample <- reactive({
+        
+        # Dummy line to trigger off button-press
+        foo <- input$resample
+        
+        x1 <- input$range1[1]
+        x2 <- input$range1[2]
+        x3 <- input$range2[1]
+        x4 <- input$range2[2]
+        x5 <- input$replicates[1]
+        x6 <- input$replicates[2]
+        
+        top <-  input$top
+        
+        # seems that I need to use both c(x1,x2) c(x1:x2) so sample unction works correctly
+        
+        if (x1==x2) {
+            
+            middle <-  sample(c(x1,x2),   top, replace=TRUE)    # ditto groups in each top level 6
+            
+        } else {
+            
+            middle <-  sample(c(x1:x2),   top, replace=TRUE)    # ditto groups in each top level 6
+        }
+        
+        
+        if (x3==x4) {
+            
+            lower <-   sample(c(x3,x4),   sum(middle), replace=TRUE )
+            
+        } else {
+            
+            lower <-   sample(c(x3:x4),   sum(middle), replace=TRUE )
+            
+        }
+        
+        if (x5==x6) {
+            
+            replicates <-  sample(c(x5,x6),   sum(lower), replace=TRUE )
+            
+        } else {
+            
+            replicates <-  sample(c(x5:x6),   sum(lower), replace=TRUE )
+            
+        }
+        
+        N <- sum(replicates)
+        
+        a=input$a
+        b=input$b
+        c=input$c
+        d=input$intercept
+        residual <- input$d
+        
+        # random effects
+        top.r <-    rnorm(top,          d,                a)    # 6
+        middle.r <- rnorm(sum(middle),  0,                b)    # 43 middle random effects
+        lower.r <-  rnorm(sum(lower),   0,                c)    # 739
+        
+        # ids
+        lower.id <- rep(seq_len(sum(lower)), replicates )       # expand lower (1:723) by replicates 
+        middle.id <- cut(lower.id, c(0,cumsum(lower)),  labels=FALSE)
+        top.id   <- cut(middle.id, c(0,cumsum(middle)), labels=FALSE)
+        
+        return(list(top.r=top.r, middle.r=middle.r, lower.r=lower.r, intercept=d, residual=residual,
+                    middle=middle, top=top, lower=lower, replicates=replicates,
+                    N=N, top.id=top.id, middle.id=middle.id, lower.id=lower.id, 
+                    a=a, b=b, c=c))
+        
+    }) 
+    
+    # --------------------------------------------------------------------------
+    # Set up the dataset based on the inputs 
+    make.regression <- reactive({
+        
+        sample <- random.sample()
+        
+        top <-        sample$top
+        middle <-     sample$middle
+        lower <-      sample$lower
+        replicates <- sample$replicates
+        
+        # random effects
+        top.r <-    sample$top.r 
+        middle.r <- sample$middle.r 
+        lower.r <-  sample$lower.r 
+        
+        # ids
+        lower.id <- sample$lower.id
+        middle.id <- sample$middle.id
+        top.id   <- sample$top.id 
+        
+        Data <- data.frame( top=top.id, mid=middle.id, low=lower.id,
+                            y= rnorm( sum(replicates), top.r[top.id] + 
+                                          middle.r[middle.id] + lower.r[lower.id], sample$residual ) )
+        
+        df <- as.data.frame(Data)
+        return(list(df=df , middle.id=middle.id, top.id=top.id)) 
+        
+    })  
+    # --------------------------------------------------------------------------
+    # Fit the specified regression model
+    fit.regression <- reactive({
+        
+        data <- make.regression()
+        
+        df <- data$df
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Conditionally fit the model
+        
+        if (input$Model == "nlme package") {
+            
+            fit.res <-  
+                tryCatch(intervals(lme(y ~ 1, random = ~1 |  top/mid/low , data=df, method="REML")), 
+                         error=function(e) e)
+            
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            ###http://stackoverflow.com/questions/8093914
+            ###/skip-to-next-value-of-loop-upon-error-in-r-trycatch
+            
+            if (!inherits(fit.res, "error")) {
+                
+                modelint <- fit.res
+                
+                emu      <-p1(modelint[['fixed']][2][[1]])  
+                etop     <-p1(modelint[['reStruct']][['top']][2][[1]])
+                eday     <-p1(modelint[['reStruct']][['mid']][2][[1]])
+                erun     <-p1(modelint[['reStruct']][['low']][2][[1]])
+                esigma   <-p1(modelint[['sigma']][2][[1]])
+                
+            } else  {
+                
+                fit.res <- NULL
+                
+            }
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        } else {            #if (input$model == "VCA") {          
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            o <- fit.res<- tryCatch(fitVCA(y~top/mid/low, df, "reml"), 
+                                    error=function(e) e) 
+            
+            
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+            if (!inherits(fit.res, "error")) {
+                
+                fit.res <- VCAinference(fit.res, ci.method = "sas")
+                
+                x <- as.matrix(o)
+                features <- attributes(x)
+                
+                emu      <- p1(features$Mean) 
+                
+                o <- as.matrix(o)
+                etop     <-p1(o["top","SD"])
+                eday     <-p1(o["top:mid","SD"])
+                erun     <-p1(o["top:mid:low","SD"])
+                esigma   <-p1(o["error","SD"])
+                
+            } else  {
+                
+                fit.res <- NULL
+                
+            }
+            
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+        }
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        # Get the model summary
+        if (is.null(fit.res)) {
+            
+            fit.summary <- NULL
+            
+        } else {
+            
+            fit.summary <-  (fit.res)
+        }
+        
+        return(list(emu=emu, etop=etop, eday=eday, erun=erun,
+                    esigma=esigma, fit.res=fit.res, fit.summary=fit.summary))
+        
+    })     
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Plot a scatter of the data  
+    
+    output$reg.plot <- renderPlot({         
+        
+        # Get the current regression data
+        data1 <- make.regression()
+        
+        d1 <- data1$df
+        
+        # Conditionally plot
+        if (input$Plot == "Base plot") {
+            
+            #base plot~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # middle groups for plot
+            xxx<- cumsum(as.vector(table(data1$middle.id)))
+            xxx <-d1$low[xxx]
+            
+            # top groups for plot
+            yyy<- cumsum(as.vector(table(data1$top.id)))
+            yyy <-d1$low[yyy]
+            
+            plot( y ~ factor(low), data=d1 , 
+                  main=paste("Variability Chart. Truth (estimate): intercept ",input$intercept,"(",fit.regression()$emu,"), top level sd=",
+                             input$a,"(",fit.regression()$etop,")", ",\n middle level sd=",
+                             input$b ,"(",fit.regression()$eday,"), lowest level sd=",
+                             input$c, "(",fit.regression()$erun,") & random error sd=", 
+                             input$d,"(",fit.regression()$esigma,")"),
+                  main="lowest level grouped", xlab="lowest level groups")
+            
+            abline( v=c(0,xxx)+0.5, lty=2, col='green' )
+            abline( v=c(0,yyy)+0.5, lty=2, col='blue' )
+            
+            
+        } else {
+            
+            #VCA plot~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            #require(VCA)
+            varPlot(y~top/mid/low, d1, 
+                    BG=list(var="top", 
+                            col=c("#f7fcfd","#e5f5f9","#ccece6","#99d8c9",
+                                  "#66c2a4","#41ae76","#238b45","#006d2c","#00441b"), 
+                            col.table=TRUE), 
+                    VLine=list(var=c("top", "mid"), 
+                               col=c("black", "mediumseagreen"), lwd=c(2,1), 
+                               col.table=c(TRUE,TRUE)), 
+                    JoinLevels=list(var="low", col=c("lightblue", "cyan", "yellow"), 
+                                    lwd=c(2,2,2)), 
+                    MeanLine=list(var="top", col="blue", lwd=2),
+                    Title=list(main=paste("Variability Chart. Truth (estimate): intercept ",input$intercept,"(",fit.regression()$emu,"), top level sd=",
+                                          input$a,"(",fit.regression()$etop,")", ",\n middle level sd=",
+                                          input$b ,"(",fit.regression()$eday,"), lowest level sd=",
+                                          input$c, "(",fit.regression()$erun,") & random error sd=", 
+                                          input$d,"(",fit.regression()$esigma,")")),
+                    
+                    # MeanLine=list(var="mid", col="pink", lwd=2),
+                    Points=list(pch=list(var="mid", pch=c(21, 22, 24)), 
+                                bg =list(var="mid", bg=c("lightblue", "cyan", "yellow")), 
+                                cex=1.25))    
+            
+            
+        }
+        
+    })
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #---------------------------------------------------------------------------
+    # Plot a scatter of the data  
+    
+    output$reg.plot2 <- renderPlot({         
+        
+        # Get the current regression data
+        data1 <- bioequivfda()
+        
+        d1 <- data1$foo
+        
+        # Conditionally plot
+        if (input$Plot == "Base plot") {
+            
+            #base plot~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # middle groups for plot
+            xxx<- cumsum(as.vector(table(d1$BATCH)))
+            xxx <-d1$SECTOR[xxx]
+            
+            # top groups for plot
+            yyy<- cumsum(as.vector(table(d1$PRODUCT)))
+            yyy <-d1$SECTOR[yyy]
+            
+            plot( y ~ factor(SECTOR), data=d1 , 
+                  main=paste("Variability Chart. Truth (estimate): intercept ",0,"(",fit.regression()$emu,"), top level sd=",
+                             input$a,"(",fit.regression()$etop,")", ",\n middle level sd=",
+                             input$b ,"(",fit.regression()$eday,"), lowest level sd=",
+                             input$c, "(",fit.regression()$erun,") & random error sd=", 
+                             input$d,"(",fit.regression()$esigma,")"),
+                  main="lowest level grouped", xlab="lowest level groups")
+            
+            abline( v=c(0,xxx)+0.5, lty=2, col='green' )
+            abline( v=c(0,yyy)+0.5, lty=2, col='blue' )
+            
+            
+        } else {
+            
+
+            #VCA plot~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+           # require(VCA)
+            varPlot(y~PRODUCT/BATCH/SECTOR/REP, d1, 
+                    BG=list(var="PRODUCT", 
+                            col=c("#f7fcfd","#e5f5f9","#ccece6","#99d8c9",
+                                  "#66c2a4","#41ae76","#238b45","#006d2c","#00441b"), 
+                            col.table=TRUE), 
+                    VLine=list(var=c("PRODUCT", "BATCH"), 
+                               col=c("black", "mediumseagreen"), lwd=c(2,1), 
+                               col.table=c(TRUE,TRUE)), 
+                    JoinLevels=list(var="SECTOR", col=c("lightblue", "cyan", "yellow"), 
+                                    lwd=c(2,2,2)), 
+                    MeanLine=list(var="PRODUCT", col="blue", lwd=2),
+                    Title=list(main=paste("Variability Chart. Truth (estimate): intercept ",0,"(",fit.regression()$emu,"), top level sd=",
+                                          input$a,"(",fit.regression()$etop,")", ",\n middle level sd=",
+                                          input$b ,"(",fit.regression()$eday,"), lowest level sd=",
+                                          input$c, "(",fit.regression()$erun,") & random error sd=", 
+                                          input$d,"(",fit.regression()$esigma,")")),
+                    
+                    # MeanLine=list(var="mid", col="pink", lwd=2),
+                    Points=list(pch=list(var="BATCH", pch=c(21, 22, 24)), 
+                                bg =list(var="BATCH", bg=c("lightblue", "cyan", "yellow")), 
+                                cex=1.25))    
+            
+        }
+        
+    })
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    bioequivf <- reactive({
+        
+        data1 <- make.regression()
+        
+        foo <- data1$df
+        foo$top <-    ifelse(foo$top %in% 1, "REF", "TEST")
+        foo$top <-    factor(foo$top)
+        foo$SECTOR <- foo$low
+        foo$BATCH <-  foo$mid
+        
+        A <- unique(input$range1)*unique(input$range2)
+        B <- unique(input$replicates)
+        
+         res <- bioequiv(foo1=foo, nrXlr=A, mr= B, 
+                                   ntXlt=A, mt= B,
+              response="y",indep="low", split="top", ref="REF", test="TEST")
+         
+        return(list(res=res))
+    
+    
+    })
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    bioequivfda <- reactive({
+        
+      lines <- c("1 31 B REF 5.957211 1 31 M REF 5.961802 1 31 E REF 5.967178 1 32 B REF 6.010251 1 32 M REF 6.004711 1 32 E REF 6.004797 1 33 B REF 5.884161 1 33 M REF 5.894085 1 33 E REF 5.895977 1 34 B REF 5.624705 1 34 M REF 5.632991 1 34 E REF 5.614428 1 35 B REF 5.957329 1 35 M REF 5.966059 1 35 E REF 5.968143 1 36 B REF 5.074298 1 36 M REF 5.063063 1 36 E REF 5.058519 1 37 B REF 5.418587 1 37 M REF 5.420591 1 37 E REF 5.418178 1 38 B REF 6.325178 1 38 M REF 6.321954 1 38 E REF 6.303148 1 39 B REF 5.656286 1 39 M REF 5.68025 1 39 E REF 5.675036 1 40 B REF 5.792299 1 40 M REF 5.775161 1 40 E REF 5.793083 2 41 B REF 5.601033 2 41 M REF 5.611223 2 41 E REF 5.601142 2 42 B REF 5.61553 2 42 M REF 5.587412 2 42 E REF 5.591004 2 43 B REF 5.682466 2 43 M REF 5.676472 2 43 E REF 5.671434 2 44 B REF 5.844336 2 44 M REF 5.855172 2 44 E REF 5.862329 2 45 B REF 5.898151 2 45 M REF 5.883657 2 45 E REF 5.878956 2 46 B REF 6.100662 2 46 M REF 6.105463 2 46 E REF 6.108098 2 47 B REF 6.294753 2 47 M REF 6.28534 2 47 E REF 6.302333 2 48 B REF 5.638072 2 48 M REF 5.627372 2 48 E REF 5.623516 2 49 B REF 5.113562 2 49 M REF 5.122454 2 49 E REF 5.109271 2 50 B REF 5.932752 2 50 M REF 5.913438 2 50 E REF 5.912427 3 51 B REF 5.961947 3 51 M REF 5.955332 3 51 E REF 5.943721 3 52 B REF 6.2334 3 52 M REF 6.250689 3 52 E REF 6.219668 3 53 B REF 6.041431 3 53 M REF 6.038234 3 53 E REF 6.080464 3 54 B REF 6.049713 3 54 M REF 6.039759 3 54 E REF 6.054218 3 55 B REF 6.834563 3 55 M REF 6.85264 3 55 E REF 6.857395 3 56 B REF 4.864966 3 56 M REF 4.907521 3 56 E REF 4.891049 3 57 B REF 5.895176 3 57 M REF 5.885851 3 57 E REF 5.874895 3 58 B REF 6.45826 3 58 M REF 6.443113 3 58 E REF 6.435882 3 59 B REF 6.090533 3 59 M REF 6.102835 3 59 E REF 6.077606  3 60 B REF 5.886724 3 60 M REF 5.920949 3 60 E REF 5.915749 4 1 B TEST 6.894594 4 1 M TEST 6.913011 4 1 E TEST 6.895764 4 2 B TEST 5.832334 4 2 M TEST 5.846562 4 2 E TEST 5.832269 4 3 B TEST 6.235755 4 3 M TEST 6.26231 4 3 E TEST 6.245095 4 4 B TEST 5.646185 4 4 M TEST 5.635887 4 4 E TEST 5.63034 4 5 B TEST 5.960711 4 5 M TEST 5.962902 4 5 E TEST 5.961959 4 6 B TEST 5.500354 4 6 M TEST 5.508444 4 6 E TEST 5.513115 4 7 B TEST 6.663099 4 7 M TEST 6.64733 4 7 E TEST 6.651215 4 8 B TEST 5.724774 4 8 M TEST 5.72086 4 8 E TEST 5.71411 4 9 B TEST 6.183375 4 9 M TEST 6.186433 4 9 E TEST 6.182109 4 10 B TEST 5.64053 4 10 M TEST 5.648589 4 10 E TEST 5.626395 5 11 B TEST 6.69764 5 11 M TEST 6.71128 5 11 E TEST 6.699829 5 12 B TEST 6.555609 5 12 M TEST 6.549935 5 12 E TEST 6.551611 5 13 B TEST 5.009683 5 13 M TEST 5.013969 5 13 E TEST 5.010928 5 14 B TEST 5.440976 5 14 M TEST 5.42057 5 14 E TEST 5.447687 5 15 B TEST 6.477609 5 15 M TEST 6.456082  5 15 E TEST 6.448981 5 16 B TEST 6.442601 5 16 M TEST 6.426217 5 16 E TEST 6.436262 5 17 B TEST 5.640496 5 17 M TEST 5.63846 5 17 E TEST 5.640755 5 18 B TEST 6.597718 5 18 M TEST 6.599232 5 18 E TEST 6.609437 5 19 B TEST 6.007241 5 19 M TEST 5.990695 5 19 E TEST 5.984292 5 20 B TEST 6.781806 5 20 M TEST 6.774386 5 20 E TEST 6.784001 6 21 B TEST 5.993852 6 21 M TEST 5.994287 6 21 E TEST 5.993541 6 22 B TEST 6.012322 6 22 M TEST 6.006182 6 22 E TEST 6.017961 6 23 B TEST 5.965969 6 23 M TEST 5.97125 6 23 E TEST 5.967839 6 24 B TEST 5.592609 6 24 M TEST 5.581154 6 24 E TEST 5.588877 6 25 B TEST 6.002182 6 25 M TEST 6.011583 6 25 E TEST 6.018746 6 26 B TEST 5.267014 6 26 M TEST 5.272291 6 26 E TEST 5.265213 6 27 B TEST 5.766104 6 27 M TEST 5.786727 6 27 E TEST 5.773194 6 28 B TEST 6.054975 6 28 M TEST 6.05232 6 28 E TEST 6.061088 6 29 B TEST 5.838689 6 29 M TEST 5.837566 6 29 E TEST 5.842508 6 30 B TEST 5.784255 6 30 M TEST 5.789891 6 30 E TEST 5.788662")
+      
+      con <- textConnection(lines)
+      cnames <- c("BATCH","SECTOR","REP","PRODUCT","y")
+      fda <- read.table(con, col.names=cnames)
+      close(con)
+      
+        foo <- fda
+        
+        foo$fda1 <- exp(foo$y)  # the bioequiv function logs the data, but the fda data is already logged
+        
+        res.fdax <- bioequiv(foo1=foo , nrXlr=10*3, mr= 3, 
+                                       ntXlt=10*3, mt= 3,
+                 response="fda1",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
+        
+        return(list(res.fda=res.fdax, foo=foo))
+        
+        
+    })
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    userdata <- reactive({
+        
+        df <-NULL
+        req(input$file1)
+        df <- read.csv(input$file1$datapath,
+                       header = input$header,
+                       sep = input$sep,
+                       quote = input$quote)
+        
+        df <- as.data.frame(df)
+        
+        REF <-  df[df$PRODUCT %in% "REF",]
+        TEST <- df[df$PRODUCT %in% "TEST",]
+        
+        #work out the design
+        mr <- unique(with(REF, table(SECTOR)))
+        mt <- unique(with(TEST, table(SECTOR))) 
+   
+        x <- REF[,c(1,2)]
+        x <- unique(x)
+        nrXlr <- sum(as.vector(table(x$BATCH)))
+        
+        
+        x <- TEST[,c(1,2)]
+        x <- unique(x)
+        ntXlt <- sum(as.vector(table(x$BATCH)))
+        
+        user.analysis<- bioequiv(foo1=df , 
+                        nrXlr=nrXlr, mr= mr, 
+                            ntXlt=ntXlt, mt= mr,
+                            response="y",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
+        
+        return(user.analysis)
+        
+        
+    })
+   
+      
+    #---------------------------------------------------------------------------
+    output$reg.summary <- renderPrint({
+        
+        summary <- fit.regression()$fit.summary
+        
+        if (!is.null(summary)) {
+            
+            return(fit.regression()$fit.summary)
+            
+        }
+        
+    })
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    output$summary2 <- renderPrint({
+        
+        return(make.regression()$df)
+        
+    })
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    output$bioequiv0 <- renderPrint({
+        
+        return(bioequivf()$res)
+        
+    })
+    
+    #~~~~~~~~~~~analysis on fda data]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+     output$bioequivfda1 <- renderPrint({
+        
+        return(bioequivfda()$res.fda)
+       
+   })
+    
+     # output$fda.x <- renderPrint({
+     #   
+     #   return(extra.fda()$res.fda)
+     #   
+     #   
+     # })
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    # print the fda data
+    output$summary3 <- renderPrint({
+        
+        return(bioequivfda()$foo)
+        
+    })
+    
+    #~~~~~~~~~~~ loading in data
+    output$contents <- renderTable({
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        df<- NULL
+        req(input$file1)
+        df <- read.csv(input$file1$datapath,
+                       header = input$header,
+                       sep = input$sep,
+                       quote = input$quote)
+        
+        df<- as.data.frame(df)
+        
+        if(input$disp == "head") {
+         return(head(df))
+         }
+          else {
+          return(df)
+        } 
+        
+        
+    })
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    output$contents2 <- renderPrint({
+      
+        if(input$what == "Analysis"){
+          
+            df<-NULL
+            req(input$file1)
+            df <- read.csv(input$file1$datapath,
+                           header = input$header,
+                           sep = input$sep,
+                           quote = input$quote)
+            
+          df<- as.data.frame(df)
+          
+          REF <-  df[df$PRODUCT %in% "REF",]
+          TEST <- df[df$PRODUCT %in% "TEST",]
+          
+          #work out the design
+          mr <- unique(with(REF, table(SECTOR)))
+          mt <- unique(with(TEST, table(SECTOR))) 
+          
+          x <- REF[,c(1,2)]
+          x <- unique(x)
+          nrXlr <- sum(as.vector(table(x$BATCH)))
+          
+          
+          x <- TEST[,c(1,2)]
+          x <- unique(x)
+          ntXlt <- sum(as.vector(table(x$BATCH)))
+          
+          user.analysis<- bioequiv(foo1=df , 
+                                   nrXlr=nrXlr, mr= mr, 
+                                   ntXlt=ntXlt, mt= mr,
+                                   response="y",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
+          
+        
+    }})
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    output$plotx <- renderPlot({
+        if(input$what == "plot"){
+          
+            df<-NULL
+            req(input$file1)
+            df <- read.csv(input$file1$datapath,
+                           header = input$header,
+                           sep = input$sep,
+                           quote = input$quote)
+            
+            df<- as.data.frame(df)
+            
+            varPlot(y~PRODUCT/BATCH/SECTOR/REP, df, 
+                    BG=list(var="PRODUCT", 
+                            col=c("#f7fcfd","#e5f5f9","#ccece6","#99d8c9",
+                                  "#66c2a4","#41ae76","#238b45","#006d2c","#00441b"), 
+                            col.table=TRUE), 
+                    VLine=list(var=c("PRODUCT", "BATCH"), 
+                               col=c("black", "mediumseagreen"), lwd=c(2,1), 
+                               col.table=c(TRUE,TRUE)), 
+                    JoinLevels=list(var="SECTOR", col=c("lightblue", "cyan", "yellow"), 
+                                    lwd=c(2,2,2)), 
+                    MeanLine=list(var="PRODUCT", col="blue", lwd=2),
+                    Title=list(main=paste("Variability Chart. Truth (estimate): intercept ",0,"(",fit.regression()$emu,"), top level sd=",
+                                          input$a,"(",fit.regression()$etop,")", ",\n middle level sd=",
+                                          input$b ,"(",fit.regression()$eday,"), lowest level sd=",
+                                          input$c, "(",fit.regression()$erun,") & random error sd=", 
+                                          input$d,"(",fit.regression()$esigma,")")),
+                    
+                    # MeanLine=list(var="mid", col="pink", lwd=2),
+                    Points=list(pch=list(var="BATCH", pch=c(21, 22, 24)), 
+                                bg =list(var="BATCH", bg=c("lightblue", "cyan", "yellow")), 
+                                cex=1.25)) 
+            
+            }  
+    })   
+    
+})
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+# Run the application 
+shinyApp(ui = ui, server = server)
