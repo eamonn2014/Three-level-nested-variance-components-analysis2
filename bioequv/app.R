@@ -1,28 +1,37 @@
 # Rshiny ideas from on https://gallery.shinyapps.io/multi_regression/
 # fda budesonide bioequivalence 
 
-library(shiny)
-library(nlme)
-library(VCA)
-library(knitr)
-require(VCA)
-library(shinythemes)
-options(max.print=1000000)
-fig.width <- 1200
-fig.height <- 450
-p1 <- function(x) {formatC(x, format="f", digits=1)}
+    library(shiny)
+    library(nlme)
+    library(VCA)
+    library(knitr)
+    require(VCA)
+    library(shinythemes)        # more funky looking apps
+    options(max.print=1000000)  # allows printing of long listings
+    fig.width <- 1200
+    fig.height <- 450
+    p1 <- function(x) {formatC(x, format="f", digits=1)}
 
 
 
-####
+# This is the FDA data copied from the guidance
 
-lines <- c("1 31 B REF 5.957211 1 31 M REF 5.961802 1 31 E REF 5.967178 1 32 B REF 6.010251 1 32 M REF 6.004711 1 32 E REF 6.004797 1 33 B REF 5.884161 1 33 M REF 5.894085 1 33 E REF 5.895977 1 34 B REF 5.624705 1 34 M REF 5.632991 1 34 E REF 5.614428 1 35 B REF 5.957329 1 35 M REF 5.966059 1 35 E REF 5.968143 1 36 B REF 5.074298 1 36 M REF 5.063063 1 36 E REF 5.058519 1 37 B REF 5.418587 1 37 M REF 5.420591 1 37 E REF 5.418178 1 38 B REF 6.325178 1 38 M REF 6.321954 1 38 E REF 6.303148 1 39 B REF 5.656286 1 39 M REF 5.68025 1 39 E REF 5.675036 1 40 B REF 5.792299 1 40 M REF 5.775161 1 40 E REF 5.793083 2 41 B REF 5.601033 2 41 M REF 5.611223 2 41 E REF 5.601142 2 42 B REF 5.61553 2 42 M REF 5.587412 2 42 E REF 5.591004 2 43 B REF 5.682466 2 43 M REF 5.676472 2 43 E REF 5.671434 2 44 B REF 5.844336 2 44 M REF 5.855172 2 44 E REF 5.862329 2 45 B REF 5.898151 2 45 M REF 5.883657 2 45 E REF 5.878956 2 46 B REF 6.100662 2 46 M REF 6.105463 2 46 E REF 6.108098 2 47 B REF 6.294753 2 47 M REF 6.28534 2 47 E REF 6.302333 2 48 B REF 5.638072 2 48 M REF 5.627372 2 48 E REF 5.623516 2 49 B REF 5.113562 2 49 M REF 5.122454 2 49 E REF 5.109271 2 50 B REF 5.932752 2 50 M REF 5.913438 2 50 E REF 5.912427 3 51 B REF 5.961947 3 51 M REF 5.955332 3 51 E REF 5.943721 3 52 B REF 6.2334 3 52 M REF 6.250689 3 52 E REF 6.219668 3 53 B REF 6.041431 3 53 M REF 6.038234 3 53 E REF 6.080464 3 54 B REF 6.049713 3 54 M REF 6.039759 3 54 E REF 6.054218 3 55 B REF 6.834563 3 55 M REF 6.85264 3 55 E REF 6.857395 3 56 B REF 4.864966 3 56 M REF 4.907521 3 56 E REF 4.891049 3 57 B REF 5.895176 3 57 M REF 5.885851 3 57 E REF 5.874895 3 58 B REF 6.45826 3 58 M REF 6.443113 3 58 E REF 6.435882 3 59 B REF 6.090533 3 59 M REF 6.102835 3 59 E REF 6.077606  3 60 B REF 5.886724 3 60 M REF 5.920949 3 60 E REF 5.915749 4 1 B TEST 6.894594 4 1 M TEST 6.913011 4 1 E TEST 6.895764 4 2 B TEST 5.832334 4 2 M TEST 5.846562 4 2 E TEST 5.832269 4 3 B TEST 6.235755 4 3 M TEST 6.26231 4 3 E TEST 6.245095 4 4 B TEST 5.646185 4 4 M TEST 5.635887 4 4 E TEST 5.63034 4 5 B TEST 5.960711 4 5 M TEST 5.962902 4 5 E TEST 5.961959 4 6 B TEST 5.500354 4 6 M TEST 5.508444 4 6 E TEST 5.513115 4 7 B TEST 6.663099 4 7 M TEST 6.64733 4 7 E TEST 6.651215 4 8 B TEST 5.724774 4 8 M TEST 5.72086 4 8 E TEST 5.71411 4 9 B TEST 6.183375 4 9 M TEST 6.186433 4 9 E TEST 6.182109 4 10 B TEST 5.64053 4 10 M TEST 5.648589 4 10 E TEST 5.626395 5 11 B TEST 6.69764 5 11 M TEST 6.71128 5 11 E TEST 6.699829 5 12 B TEST 6.555609 5 12 M TEST 6.549935 5 12 E TEST 6.551611 5 13 B TEST 5.009683 5 13 M TEST 5.013969 5 13 E TEST 5.010928 5 14 B TEST 5.440976 5 14 M TEST 5.42057 5 14 E TEST 5.447687 5 15 B TEST 6.477609 5 15 M TEST 6.456082  5 15 E TEST 6.448981 5 16 B TEST 6.442601 5 16 M TEST 6.426217 5 16 E TEST 6.436262 5 17 B TEST 5.640496 5 17 M TEST 5.63846 5 17 E TEST 5.640755 5 18 B TEST 6.597718 5 18 M TEST 6.599232 5 18 E TEST 6.609437 5 19 B TEST 6.007241 5 19 M TEST 5.990695 5 19 E TEST 5.984292 5 20 B TEST 6.781806 5 20 M TEST 6.774386 5 20 E TEST 6.784001 6 21 B TEST 5.993852 6 21 M TEST 5.994287 6 21 E TEST 5.993541 6 22 B TEST 6.012322 6 22 M TEST 6.006182 6 22 E TEST 6.017961 6 23 B TEST 5.965969 6 23 M TEST 5.97125 6 23 E TEST 5.967839 6 24 B TEST 5.592609 6 24 M TEST 5.581154 6 24 E TEST 5.588877 6 25 B TEST 6.002182 6 25 M TEST 6.011583 6 25 E TEST 6.018746 6 26 B TEST 5.267014 6 26 M TEST 5.272291 6 26 E TEST 5.265213 6 27 B TEST 5.766104 6 27 M TEST 5.786727 6 27 E TEST 5.773194 6 28 B TEST 6.054975 6 28 M TEST 6.05232 6 28 E TEST 6.061088 6 29 B TEST 5.838689 6 29 M TEST 5.837566 6 29 E TEST 5.842508 6 30 B TEST 5.784255 6 30 M TEST 5.789891 6 30 E TEST 5.788662")
-con <- textConnection(lines)
-cnames <- c("BATCH","SECTOR","REP","PRODUCT","y")
-fda <- read.table(con, col.names=cnames)
-close(con)
+    lines <- c("1 31 B REF 5.957211 1 31 M REF 5.961802 1 31 E REF 5.967178 1 32 B REF 6.010251 1 32 M REF 6.004711 1 32 E REF 6.004797 1 33 B REF 5.884161 1 33 M REF 5.894085 1 33 E REF 5.895977 1 34 B REF 5.624705 1 34 M REF 5.632991 1 34 E REF 5.614428 1 35 B REF 5.957329 1 35 M REF 5.966059 1 35 E REF 5.968143 1 36 B REF 5.074298 1 36 M REF 5.063063 1 36 E REF 5.058519 1 37 B REF 5.418587 1 37 M REF 5.420591 1 37 E REF 5.418178 1 38 B REF 6.325178 1 38 M REF 6.321954 1 38 E REF 6.303148 1 39 B REF 5.656286 1 39 M REF 5.68025 1 39 E REF 5.675036 1 40 B REF 5.792299 1 40 M REF 5.775161 1 40 E REF 5.793083 2 41 B REF 5.601033 2 41 M REF 5.611223 2 41 E REF 5.601142 2 42 B REF 5.61553 2 42 M REF 5.587412 2 42 E REF 5.591004 2 43 B REF 5.682466 2 43 M REF 5.676472 2 43 E REF 5.671434 2 44 B REF 5.844336 2 44 M REF 5.855172 2 44 E REF 5.862329 2 45 B REF 5.898151 2 45 M REF 5.883657 2 45 E REF 5.878956 2 46 B REF 6.100662 2 46 M REF 6.105463 2 46 E REF 6.108098 2 47 B REF 6.294753 2 47 M REF 6.28534 2 47 E REF 6.302333 2 48 B REF 5.638072 2 48 M REF 5.627372 2 48 E REF 5.623516 2 49 B REF 5.113562 2 49 M REF 5.122454 2 49 E REF 5.109271 2 50 B REF 5.932752 2 50 M REF 5.913438 2 50 E REF 5.912427 3 51 B REF 5.961947 3 51 M REF 5.955332 3 51 E REF 5.943721 3 52 B REF 6.2334 3 52 M REF 6.250689 3 52 E REF 6.219668 3 53 B REF 6.041431 3 53 M REF 6.038234 3 53 E REF 6.080464 3 54 B REF 6.049713 3 54 M REF 6.039759 3 54 E REF 6.054218 3 55 B REF 6.834563 3 55 M REF 6.85264 3 55 E REF 6.857395 3 56 B REF 4.864966 3 56 M REF 4.907521 3 56 E REF 4.891049 3 57 B REF 5.895176 3 57 M REF 5.885851 3 57 E REF 5.874895 3 58 B REF 6.45826 3 58 M REF 6.443113 3 58 E REF 6.435882 3 59 B REF 6.090533 3 59 M REF 6.102835 3 59 E REF 6.077606  3 60 B REF 5.886724 3 60 M REF 5.920949 3 60 E REF 5.915749 4 1 B TEST 6.894594 4 1 M TEST 6.913011 4 1 E TEST 6.895764 4 2 B TEST 5.832334 4 2 M TEST 5.846562 4 2 E TEST 5.832269 4 3 B TEST 6.235755 4 3 M TEST 6.26231 4 3 E TEST 6.245095 4 4 B TEST 5.646185 4 4 M TEST 5.635887 4 4 E TEST 5.63034 4 5 B TEST 5.960711 4 5 M TEST 5.962902 4 5 E TEST 5.961959 4 6 B TEST 5.500354 4 6 M TEST 5.508444 4 6 E TEST 5.513115 4 7 B TEST 6.663099 4 7 M TEST 6.64733 4 7 E TEST 6.651215 4 8 B TEST 5.724774 4 8 M TEST 5.72086 4 8 E TEST 5.71411 4 9 B TEST 6.183375 4 9 M TEST 6.186433 4 9 E TEST 6.182109 4 10 B TEST 5.64053 4 10 M TEST 5.648589 4 10 E TEST 5.626395 5 11 B TEST 6.69764 5 11 M TEST 6.71128 5 11 E TEST 6.699829 5 12 B TEST 6.555609 5 12 M TEST 6.549935 5 12 E TEST 6.551611 5 13 B TEST 5.009683 5 13 M TEST 5.013969 5 13 E TEST 5.010928 5 14 B TEST 5.440976 5 14 M TEST 5.42057 5 14 E TEST 5.447687 5 15 B TEST 6.477609 5 15 M TEST 6.456082  5 15 E TEST 6.448981 5 16 B TEST 6.442601 5 16 M TEST 6.426217 5 16 E TEST 6.436262 5 17 B TEST 5.640496 5 17 M TEST 5.63846 5 17 E TEST 5.640755 5 18 B TEST 6.597718 5 18 M TEST 6.599232 5 18 E TEST 6.609437 5 19 B TEST 6.007241 5 19 M TEST 5.990695 5 19 E TEST 5.984292 5 20 B TEST 6.781806 5 20 M TEST 6.774386 5 20 E TEST 6.784001 6 21 B TEST 5.993852 6 21 M TEST 5.994287 6 21 E TEST 5.993541 6 22 B TEST 6.012322 6 22 M TEST 6.006182 6 22 E TEST 6.017961 6 23 B TEST 5.965969 6 23 M TEST 5.97125 6 23 E TEST 5.967839 6 24 B TEST 5.592609 6 24 M TEST 5.581154 6 24 E TEST 5.588877 6 25 B TEST 6.002182 6 25 M TEST 6.011583 6 25 E TEST 6.018746 6 26 B TEST 5.267014 6 26 M TEST 5.272291 6 26 E TEST 5.265213 6 27 B TEST 5.766104 6 27 M TEST 5.786727 6 27 E TEST 5.773194 6 28 B TEST 6.054975 6 28 M TEST 6.05232 6 28 E TEST 6.061088 6 29 B TEST 5.838689 6 29 M TEST 5.837566 6 29 E TEST 5.842508 6 30 B TEST 5.784255 6 30 M TEST 5.789891 6 30 E TEST 5.788662")
+    con <- textConnection(lines)
+    cnames <- c("BATCH","SECTOR","REP","PRODUCT","y")
+    fda <- read.table(con, col.names=cnames)
+    close(con)
 
-#####
+# inputs
+# here is my function for performing the analysis
+# data
+# the number of cannisters in a batch x number of batches (seperatelty for test and ref)
+# number of reps in each cannister (seperatelty for test and ref))
+# the response variable
+# the independent variable
+# the variable that identifies the test and refernce data
+
+
 bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
                     response="ISM",indep="CONTAIN", split="PRODUCT", ref="REF", test="TEST"
                     
@@ -30,10 +39,10 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     
     mydata<- foo1
     
-    # constants
+    # fda constants and alpha level
     thetap = ((log(1.11))^2 +0.01)/(0.1)^2 #2.0891, reg constant
     sigma_TO = 0.1
-    alpha=.05
+    alpha=0.05
     
     # denominator
     denom <- nrXlr*mr
@@ -53,14 +62,9 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     # print and plot the data
     tmp <- tmp[, c("Product", "Container", "y", "SECTOR", "BATCH")]
-    #cat("\nListing of the data\n ")
+    
     tmp$indep.var <- (tmp$y)
-    #print(plyr::arrange(tmp, Product, BATCH, Container, SECTOR, y, indep.var))
-    
-    #cat("\nPlot the data\n")
-    
-   
-    
+     
     # plot1 <- varPlot(y~Product /BATCH/Container/SECTOR, tmp,
     #                  BG=list(var="Container",
     #                          col=c("#f7fcfd", "#99d8c9"), col.table=FALSE),
@@ -71,7 +75,7 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     # (plot1)
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~STUDY DESIGN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #Analysis on the test data
+    # Analysis on the test data
     cat("\n~~~~~~~~~~~~~~~~~~~~Test Product ANOVA~~~~~~~~~~~~~~~~~~~~~~~~\n")
     x <- as.data.frame(mydata)
     foo <- x[x$Product %in% test,]
@@ -160,8 +164,7 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     EQ <- ED + E1 + E2 + E3s + E4s
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Here is where we should adjust the analysis based on negative variance components..but we do not adjust based on customer request
-    # this remains constant, if a variance component is zero the effect is not taken into account.
+    # Here is where we adjust the analysis based on negative variance components.
     DFTN0 <- (ntXlt-1)
     DFRN0 <- (nrXlr-1)
     DFT0 <-  (ntXlt*(mt-1))
@@ -185,7 +188,7 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         
     }
     
-    (HD <- (abs(ED^0.5) + qt(1-alpha, df=get.df) * se )^2)
+    HD <- (abs(ED^0.5) + qt(1-alpha, df=get.df) * se )^2
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     H1 <-  (DFTN0*E1) /  qchisq(alpha,   DFTN0)
@@ -224,18 +227,15 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     DFR0 <-  (nrXlr*(mr-1))
     
     # Constant scaled calculations, confidence bounds
-    
     H3c <- (DFRN0*E3c)/  qchisq(0.95, DFRN0)
     H4c <- (DFR0*E4c) /  qchisq(0.95, DFR0)
     U3c <- (H3c-E3c)^2 
     U4c <- (H4c-E4c)^2 
     
     # Constant scaled 95% upper confidence bound (Hmu2)
-    
     Hmu2 <-EQc + (UD + U1 + U2 + U3c + U4c)^0.5
     
-    #Conclusion
-    
+    # Conclusion
     # print all key results for cross checking
     rel <- c(response, indep, nrXlr , mr , ntXlt , mt ,
              x.barR, x.barT, x.barT-x.barR,
@@ -267,13 +267,12 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
                        "Upp 95%CI scale")
     
     if (SIGMAR > sigma_TO) {
-        colnames(res) <- c("relative scale, use this for inference","constant scale")
+        colnames(res) <- c("reference scale, use this for inference","constant scale")
     } else {
-        colnames(res) <- c("relative scale","constant scale, use this for inference")
+        colnames(res) <- c("reference scale","constant scale, use this for inference")
     }
     
     print(kable(res))
-    
     
     cat("\n")
     print(test.note); print(ref.note)
@@ -319,40 +318,30 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         
     }
     
-
-    #return(kable(res))
-    
 }
 
 
-#####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Start the app program
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
-ui <-
-    
-    fluidPage(theme = shinytheme("journal"),
+ui <- fluidPage(theme = shinytheme("journal"),
               
-               
-    shinyUI(pageWithSidebar(
-            
-            
-           # ( # closed
-        
+          shinyUI(pageWithSidebar(
       
-    headerPanel("FDA Bioequivalence Budesonide Guidance: statistical approach"),
+          headerPanel("FDA Bioequivalence Budesonide Guidance: statistical approach"),
     
-              sidebarPanel(
+          sidebarPanel(
         
         
-        div(p("Using R we perform the FDA Bioequivalence guidance evaluation (when there are n>1 replicates in 'containers'), FDA Guiudance at the following link:")),  
+        div(p("Using R we explore the FDA Bioequivalence guidance evaluation (when there are n>1 replicates in 'containers'), FDA Guidance at the following link:")),  
         tags$a(href = "https://www.accessdata.fda.gov/drugsatfda_docs/psg/Budesonide_Inhalation_Sus_20929_RC_09-12.pdf", "FDA Bioequivalence Budesonide guidance"),
         div(p(" ")),
-        div(p("We simulate data and analyse and we also analyse the FDA guidance example replicating the guidance results. Also there is an option to upload your own data for analysis. A choice of plots is given, a base plot or a plot using the VCA package. A choice of modelling is given only for the first tab using nlme or VCA package. The difference in the two is in the variance components confidence interval calculations.")),
+        div(p("We simulate data and analyse and we also analyse the FDA guidance example replicating the guidance results. There is also an option to upload your own data for analysis. A choice of plots is given, a base plot or a plot using the VCA package. A choice of modelling is given only for the first tab using nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design of the experiment before attempting to analyse.")),
         
         div(
             
-            #p("blah"),
             selectInput("Plot",
                         strong("Select plot preference "),
                         choices=c("VCA package plot" , "Base plot")),
@@ -372,22 +361,20 @@ ui <-
             div(strong("Tab 2b Bioequivalence FDA data")),p("Reproduces the FDA analysis as presented in the guidance, notice differences in decimal places."),
             div(strong("Tab 2c List the FDA data")),p("A simple listing of the FDA example data."),
             div(strong("Tab 3 Notes")),p("An explanation of the analysis"),
-            div(strong("Tab 4 User data")),p("User data can be loaded. PBE analysis takes place, the data plotted and listed. It does not have to be balanced, though it requires a balanced number of replicates within each product. The program will work out the design"),
+            div(strong("Tab 4 User data")),p("User data can be loaded. PBE analysis takes place, the data plotted and listed. It does not have to be balanced, though it requires a balanced number of replicates within each product. The program will work out the design. Use at your own risk."),
 
-            
-            
-            
-            
+         
             div(strong("Select true population parameters for simulated data (tabs 1a-1c only)"),
-            
             
             p("A 3 level nested data set is simulated. A plot of the raw data is generated. 
                   A model is fit to estimate the variance components. If the design is not balanced the FDA proposed analysis will not work. For the base plot, the blue dashed lines demark the top level groups. The green dashed lines demark the mid level groups.
                   The boxplots within the green lines demark the lowest level groups. Each boxplot presents the distribution of replicates. The middle, lowest and replicate numbers are varied randomly based on the slider ranges. The variance components are between blue 'top' groups,
-between green 'mid' groups (within blue groups), within green 'mid' groups, within 'low' groups (replicates), aka repeatability. So we actually estimate 4 components counting the residual error. Create a balanced design by reducing all the sliders to one value. The FDA guidance fits a one way ANOVA to each product data and the independent variable is the lowest level. The mid level 'batch' is not included in the analysis, however the degrees of freedom are adjusted. The guidance does not discuss how to proceed in the case that a between variance component is estimated as negative, that's a bit Pepega, we show what to do in those scenarios, see notes tab for more information.
-
-                  
-                  You also have the choices of selecting a new sample. ")),
+between green 'mid' groups (within blue groups), within green 'mid' groups, within 'low' groups (replicates), aka repeatability. So we actually estimate 4 components counting the residual error. 
+Create a balanced design by reducing all the sliders to one value. 
+The FDA guidance fits a one way ANOVA to each product data and the independent variable is the lowest level. 
+The mid level 'batch' is not included in the analysis, however the degrees of freedom are adjusted. 
+The guidance does not discuss how to proceed in the case that a between variance component is estimated as negative, that's a bit Pepega, we show what to do in those scenarios, 
+see notes tab for more information. You also have the choices of selecting a new sample. ")),
             
             
             br(),
@@ -397,24 +384,18 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
             
             br(),
             br(),
-            #p(strong("Generate true population parameters:")),   
             sliderInput("intercept",
                         "True intercept",
                         min=0, max=1000, step=.5, value=700, ticks=FALSE),
-            
             sliderInput("top",
                         "Number of levels of top component (demarked by blue or thick lines)",
                         min=2, max=100, step=1, value=2, ticks=FALSE),
-
             sliderInput("range1", "Middle level: select no. of 'mid' groups within each top level group:", 
                         min = 2, max = 10, step=1, value = c(3,3), ticks=FALSE) ,
-            
             sliderInput("range2", "Lower level: select\n no. of 'low' groups within each mid level group:",
                         min = 2, max = 10, step=1, value = c(10,10),ticks=FALSE),
-            
             sliderInput("replicates", "select number of replicates nested within each boxplot",
                         min = 2, max = 50, step=1, value = c(3,3), ticks=FALSE),
-            
             sliderInput("a",
                         "True top level SD",
                         min=1, max=100, step=.5, value=75, ticks=FALSE),
@@ -431,26 +412,17 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
 ))
     ,  
        
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~tab panels
     mainPanel(
-        
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~start of section to load in data, https://shiny.rstudio.com/articles/upload.html
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~start of section to load in data,
+        # https://shiny.rstudio.com/articles/upload.html
         # and this https://stackoverflow.com/questions/44222796/shiny-with-multiple-tabs-and-different-sidebar-in-each-tab
-       # tabsetPanel(type = "tabs", 
+        # tabsetPanel(type = "tabs", 
         
-       
-
-                    navbarPage(       
-                        
-             
-                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-                   
-                        
-                        tags$style(HTML(" 
-                   
-                  
-         .navbar-default .navbar-brand {color: cyan;}
+        navbarPage(       
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+         tags$style(HTML(" 
+        .navbar-default .navbar-brand {color: cyan;}
         .navbar-default .navbar-brand:hover {color: blue;}
         .navbar { background-color: lightgrey;}
         .navbar-default .navbar-nav > li > a {color:black;}
@@ -462,9 +434,7 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
         .navbar-default .navbar-nav > li > a[data-value='t2'] {color: blue;background-color: lightblue;}
         .navbar-default .navbar-nav > li > a[data-value='t3'] {color: green;background-color: lightgreen;}
                    ")), 
-                  
-                    
-                    ##~~~~~~~~~~~~~~~~~~~~~end of section to load in data
+        ##~~~~~~~~~~~~~~~~~~~~~end of section to load in data
              
                     #~~~~~~~~~~~~          
                     tabPanel("1a Plot and variance components analysis - simulated data", 
@@ -472,7 +442,7 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                              div(plotOutput("reg.plot", width=fig.width, height=fig.height)),  
                              
                              p(strong("Model output: arithmetic mean presented above plot when VCA is used otherwise modelled mean
-                 (artithmetic mean and modelled mean will match with a balanced design)")) ,
+                                     (arithmetic mean and modelled mean will match with a balanced design)")) ,
                              
                              div( verbatimTextOutput("reg.summary"))
                              
@@ -490,9 +460,7 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                     #~~~~~~~~~~~~~
                     tabPanel("1c List the simulated data", 
                              
-                             div( verbatimTextOutput("summary2")),
-                             
-                             p(strong("copy the above data to do your own analysis................."))
+                             div( verbatimTextOutput("summary2"))
                              
                     ) ,
                     #~~~~~~~~~~~~~~~~~~
@@ -500,8 +468,8 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                              
                              div(plotOutput("reg.plot2", width=fig.width, height=fig.height)),  
                              
-                             p(strong("Model output: arithmetic mean presented above plot when VCA is used otherwise modelled mean
-                 (artithmetic mean and modelled mean will match with a balanced design)")) 
+                             p(strong("Model output: arithmetic mean presented above plot when VCA is used, otherwise modelled mean
+                 (arithmetic mean and modelled mean will match with a balanced design)")) 
                               
                              
                     ) ,
@@ -509,8 +477,6 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                     tabPanel("2b Bioequivalence FDA data", 
                              
                              div( verbatimTextOutput("bioequivfda1")) #
-                             
-                           #  p(strong(""))
                              
                     ) ,
                     #~~~~~~~~~~~~~
@@ -522,14 +488,13 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                              
                     ),
                     #~~~~~~~~~~~~~~~~~~
-                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    
-                    tabPanel("3 Notes", value=3, #h3("Some notes and a further reference"),
+
+                    tabPanel("3 Notes", value=3, 
                               p('When the between variance components are estimted to be negative we apply the following adjustments. 
                                 to do Explain all the tabs/ upload your own data?/ this page/stats at top of fda graph...dont allow unbalanced?'),
                              p("Sometimes the mean square between (MSB) is less than the mean square within (MSW), resulting in a negative estimate for the between variance component. 
                              Thus concluding there is no additional variability due to the between variance component. In such cases the FDA PBE equations are then adjusted. We have m replicates, 
-                             n items per batch and l is the no batches per product (test and reference). The FDA guideance document states that:"),
+                             n items per batch and l is the no batches per product (test and reference). The FDA guidance document states that:"),
                               br(),
                               
                              withMathJax(
@@ -537,7 +502,7 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                            $${{\\sigma_R = }{\\sqrt{\\frac{MSB_R}{m} + \\frac{(m-1)MSW_R}{m}}}}\\!$$')),  #{\\left({\\mu,\\thinspace\\sigma^2}\\right)} \\frac{1}{2}
                              
                               withMathJax(
-                                  helpText('This is equal to   $${{}\\sigma_R ={\\sqrt{\\frac{MSB_R-MSW_R}{m} + MSW_R}}}\\!$$ In the event that $$MSB_R < MSW_R$$then $$MSB_R - MSW_R < 0$$and therefore $$\\sigma_R <  {\\sqrt{MSB_W}}$$
+                                  helpText('This is equal to $${{}\\sigma_R ={\\sqrt{\\frac{MSB_R-MSW_R}{m} + MSW_R}}}\\!$$ In the event that $$MSB_R < MSW_R$$then $$MSB_R - MSW_R < 0$$and therefore $$\\sigma_R <  {\\sqrt{MSB_W}}$$
                               This means the total variance is less than the within variance component which cannot be. If this is encountered the the total variance is set equal to the within variance component.  For either or both reference or test product id necessary. This is the first change from the guidance.')),
                                         #   $${{}\\sigma_R ={\\sqrt{\\frac{MSB_R-MSW_R}{m} + MSW_R}}}\\!$$')),   #   $${{Y}\\sim{LN}}{\\left({\\mu,\\thinspace\\sigma^2}\\right)}\\!$$')),
                               
@@ -576,8 +541,8 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                   
                     tabPanel("4 User data", fluid = TRUE,
                              
-                             
-                             p(("Upload your own data for determination of PBE equivalence. Please prepare an input file with the names 'BATCH'	'SECTOR' 'REP' 'PRODUCT' and 'y', see the FDA tab listing example. The top two radio buttons options are to help load, the bottom two options are to swap between analysis and a plot. Ensure your data is balanced. Once uploaded, toggle between the 'analysis' and 'output' radio buttons.)")) ,
+                             p(("Upload your own data for determination of PBE equivalence. 
+                                Please prepare an input file with the names 'BATCH'	'SECTOR' 'REP' 'PRODUCT' and 'y', see the FDA tab listing example. The top two radio buttons options are to help load, the bottom two options are to swap between analysis and a plot. Ensure your data is balanced. Once uploaded, toggle between the 'analysis' and 'output' radio buttons. Use at your own risk.")) ,
                              sidebarLayout(
                                
                                # Sidebar panel for inputs ----
@@ -644,23 +609,22 @@ between green 'mid' groups (within blue groups), within green 'mid' groups, with
                                  tableOutput("contents") 
                                  
                                  
-                               ),
-                               
-                             
-                             )) )
-                    )
-    ) ))
+                                ),
+                  )
+                 ) 
+                )
+               )
+              ) 
+             )
+            )
         #~~~~~~~~~~~~~~~~~~~~~~~
-        
         #~~~~~~~~~~~~~
-    
-
 
 
 server <- shinyServer(function(input, output) {
     
     # --------------------------------------------------------------------------
-    # This is where a new sample is instigated only random noise is required to be generated
+    # This is where a new sample is instigated, only random noise is required to be generated
     random.sample <- reactive({
         
         # Dummy line to trigger off button-press
@@ -675,7 +639,7 @@ server <- shinyServer(function(input, output) {
         
         top <-  input$top
         
-        # seems that I need to use both c(x1,x2) c(x1:x2) so sample unction works correctly
+        # seems that I need to use both c(x1,x2) c(x1:x2) so sample function works correctly
         
         if (x1==x2) {
             
@@ -1009,13 +973,6 @@ server <- shinyServer(function(input, output) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     bioequivfda <- reactive({
-        
-      lines <- c("1 31 B REF 5.957211 1 31 M REF 5.961802 1 31 E REF 5.967178 1 32 B REF 6.010251 1 32 M REF 6.004711 1 32 E REF 6.004797 1 33 B REF 5.884161 1 33 M REF 5.894085 1 33 E REF 5.895977 1 34 B REF 5.624705 1 34 M REF 5.632991 1 34 E REF 5.614428 1 35 B REF 5.957329 1 35 M REF 5.966059 1 35 E REF 5.968143 1 36 B REF 5.074298 1 36 M REF 5.063063 1 36 E REF 5.058519 1 37 B REF 5.418587 1 37 M REF 5.420591 1 37 E REF 5.418178 1 38 B REF 6.325178 1 38 M REF 6.321954 1 38 E REF 6.303148 1 39 B REF 5.656286 1 39 M REF 5.68025 1 39 E REF 5.675036 1 40 B REF 5.792299 1 40 M REF 5.775161 1 40 E REF 5.793083 2 41 B REF 5.601033 2 41 M REF 5.611223 2 41 E REF 5.601142 2 42 B REF 5.61553 2 42 M REF 5.587412 2 42 E REF 5.591004 2 43 B REF 5.682466 2 43 M REF 5.676472 2 43 E REF 5.671434 2 44 B REF 5.844336 2 44 M REF 5.855172 2 44 E REF 5.862329 2 45 B REF 5.898151 2 45 M REF 5.883657 2 45 E REF 5.878956 2 46 B REF 6.100662 2 46 M REF 6.105463 2 46 E REF 6.108098 2 47 B REF 6.294753 2 47 M REF 6.28534 2 47 E REF 6.302333 2 48 B REF 5.638072 2 48 M REF 5.627372 2 48 E REF 5.623516 2 49 B REF 5.113562 2 49 M REF 5.122454 2 49 E REF 5.109271 2 50 B REF 5.932752 2 50 M REF 5.913438 2 50 E REF 5.912427 3 51 B REF 5.961947 3 51 M REF 5.955332 3 51 E REF 5.943721 3 52 B REF 6.2334 3 52 M REF 6.250689 3 52 E REF 6.219668 3 53 B REF 6.041431 3 53 M REF 6.038234 3 53 E REF 6.080464 3 54 B REF 6.049713 3 54 M REF 6.039759 3 54 E REF 6.054218 3 55 B REF 6.834563 3 55 M REF 6.85264 3 55 E REF 6.857395 3 56 B REF 4.864966 3 56 M REF 4.907521 3 56 E REF 4.891049 3 57 B REF 5.895176 3 57 M REF 5.885851 3 57 E REF 5.874895 3 58 B REF 6.45826 3 58 M REF 6.443113 3 58 E REF 6.435882 3 59 B REF 6.090533 3 59 M REF 6.102835 3 59 E REF 6.077606  3 60 B REF 5.886724 3 60 M REF 5.920949 3 60 E REF 5.915749 4 1 B TEST 6.894594 4 1 M TEST 6.913011 4 1 E TEST 6.895764 4 2 B TEST 5.832334 4 2 M TEST 5.846562 4 2 E TEST 5.832269 4 3 B TEST 6.235755 4 3 M TEST 6.26231 4 3 E TEST 6.245095 4 4 B TEST 5.646185 4 4 M TEST 5.635887 4 4 E TEST 5.63034 4 5 B TEST 5.960711 4 5 M TEST 5.962902 4 5 E TEST 5.961959 4 6 B TEST 5.500354 4 6 M TEST 5.508444 4 6 E TEST 5.513115 4 7 B TEST 6.663099 4 7 M TEST 6.64733 4 7 E TEST 6.651215 4 8 B TEST 5.724774 4 8 M TEST 5.72086 4 8 E TEST 5.71411 4 9 B TEST 6.183375 4 9 M TEST 6.186433 4 9 E TEST 6.182109 4 10 B TEST 5.64053 4 10 M TEST 5.648589 4 10 E TEST 5.626395 5 11 B TEST 6.69764 5 11 M TEST 6.71128 5 11 E TEST 6.699829 5 12 B TEST 6.555609 5 12 M TEST 6.549935 5 12 E TEST 6.551611 5 13 B TEST 5.009683 5 13 M TEST 5.013969 5 13 E TEST 5.010928 5 14 B TEST 5.440976 5 14 M TEST 5.42057 5 14 E TEST 5.447687 5 15 B TEST 6.477609 5 15 M TEST 6.456082  5 15 E TEST 6.448981 5 16 B TEST 6.442601 5 16 M TEST 6.426217 5 16 E TEST 6.436262 5 17 B TEST 5.640496 5 17 M TEST 5.63846 5 17 E TEST 5.640755 5 18 B TEST 6.597718 5 18 M TEST 6.599232 5 18 E TEST 6.609437 5 19 B TEST 6.007241 5 19 M TEST 5.990695 5 19 E TEST 5.984292 5 20 B TEST 6.781806 5 20 M TEST 6.774386 5 20 E TEST 6.784001 6 21 B TEST 5.993852 6 21 M TEST 5.994287 6 21 E TEST 5.993541 6 22 B TEST 6.012322 6 22 M TEST 6.006182 6 22 E TEST 6.017961 6 23 B TEST 5.965969 6 23 M TEST 5.97125 6 23 E TEST 5.967839 6 24 B TEST 5.592609 6 24 M TEST 5.581154 6 24 E TEST 5.588877 6 25 B TEST 6.002182 6 25 M TEST 6.011583 6 25 E TEST 6.018746 6 26 B TEST 5.267014 6 26 M TEST 5.272291 6 26 E TEST 5.265213 6 27 B TEST 5.766104 6 27 M TEST 5.786727 6 27 E TEST 5.773194 6 28 B TEST 6.054975 6 28 M TEST 6.05232 6 28 E TEST 6.061088 6 29 B TEST 5.838689 6 29 M TEST 5.837566 6 29 E TEST 5.842508 6 30 B TEST 5.784255 6 30 M TEST 5.789891 6 30 E TEST 5.788662")
-      
-      con <- textConnection(lines)
-      cnames <- c("BATCH","SECTOR","REP","PRODUCT","y")
-      fda <- read.table(con, col.names=cnames)
-      close(con)
       
         foo <- fda
         
@@ -1097,20 +1054,13 @@ server <- shinyServer(function(input, output) {
         
     })
     
-    #~~~~~~~~~~~analysis on fda data]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+    #~~~~~~~~~~~analysis on fda data
      output$bioequivfda1 <- renderPrint({
         
-        return(bioequivfda()$res.fda)
+        return(bioequivfda()$res.fdax)
        
    })
-    
-     # output$fda.x <- renderPrint({
-     #   
-     #   return(extra.fda()$res.fda)
-     #   
-     #   
-     # })
-    
+  
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     # print the fda data
     output$summary3 <- renderPrint({
