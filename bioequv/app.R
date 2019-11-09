@@ -1053,7 +1053,7 @@ server <- shinyServer(function(input, output) {
     
   
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    # execute sim data analysis
+    # execute simulation data analysis
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     bioequivf <- reactive({
         
@@ -1111,44 +1111,44 @@ server <- shinyServer(function(input, output) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     # perform PBE analysis on user data
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    userdata <- reactive({
-        
-        df <-NULL
-        req(input$file1)
-        df <- read.csv(input$file1$datapath,
-                       header = input$header,
-                       sep = input$sep,
-                       quote = input$quote)
-        
-        df <- as.data.frame(df)
-        
-        df$y <- exp(df$y) 
-        
-        REF <-  df[df$PRODUCT %in% "REF",]
-        TEST <- df[df$PRODUCT %in% "TEST",]
-        
-        #work out the design ------------
-        mr <- unique(with(REF, table(SECTOR)))
-        mt <- unique(with(TEST, table(SECTOR))) 
-   
-        x <- REF[,c(1,2)]
-        x <- unique(x)
-        nrXlr <- sum(as.vector(table(x$BATCH)))
-        
-        
-        x <- TEST[,c(1,2)]
-        x <- unique(x)
-        ntXlt <- sum(as.vector(table(x$BATCH)))
-        
-        user.analysis<- bioequiv(foo1=df , 
-                        nrXlr=nrXlr, mr= mr, 
-                            ntXlt=ntXlt, mt= mr,
-                            response="y",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
-        
-        return(user.analysis)
-        
-        
-    })
+    # userdata <- reactive({
+    #     
+    #     df <-NULL
+    #     req(input$file1)
+    #     df <- read.csv(input$file1$datapath,
+    #                    header = input$header,
+    #                    sep = input$sep,
+    #                    quote = input$quote)
+    #     
+    #     df <- as.data.frame(df)
+    #     
+    #     df$y <- exp(df$y) 
+    #     
+    #     REF <-  df[df$PRODUCT %in% "REF",]
+    #     TEST <- df[df$PRODUCT %in% "TEST",]
+    #     
+    #     #work out the design ------------
+    #     mr <- unique(with(REF, table(SECTOR)))
+    #     mt <- unique(with(TEST, table(SECTOR))) 
+    # 
+    #     x <- REF[,c(1,2)]
+    #     x <- unique(x)
+    #     nrXlr <- sum(as.vector(table(x$BATCH)))
+    #     
+    #     
+    #     x <- TEST[,c(1,2)]
+    #     x <- unique(x)
+    #     ntXlt <- sum(as.vector(table(x$BATCH)))
+    #     
+    #     user.analysis<- bioequiv(foo1=df , 
+    #                     nrXlr=nrXlr, mr= mr, 
+    #                         ntXlt=ntXlt, mt= mr,
+    #                         response="y",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
+    #     
+    #     return(user.analysis)
+    #     
+    #     
+    # })
    
       
     #---------------------------------------------------------------------------
@@ -1251,7 +1251,7 @@ server <- shinyServer(function(input, output) {
     })
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # PBE analysis of user uploaded data, again?
+    # PBE analysis of user uploaded data 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     output$contents2 <- renderPrint({
       
