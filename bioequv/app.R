@@ -1109,7 +1109,7 @@ server <- shinyServer(function(input, output) {
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    # perform  analysis on user data
+    # perform PBE analysis on user data
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     userdata <- reactive({
         
@@ -1121,6 +1121,8 @@ server <- shinyServer(function(input, output) {
                        quote = input$quote)
         
         df <- as.data.frame(df)
+        
+        df$y <- exp(df$y) 
         
         REF <-  df[df$PRODUCT %in% "REF",]
         TEST <- df[df$PRODUCT %in% "TEST",]
@@ -1249,7 +1251,7 @@ server <- shinyServer(function(input, output) {
     })
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # analysing user uploaded data
+    # PBE analysis of user uploaded data, again?
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     output$contents2 <- renderPrint({
       
@@ -1263,6 +1265,8 @@ server <- shinyServer(function(input, output) {
                            quote = input$quote)
             
           df<- as.data.frame(df)
+          
+          df$y <- exp(df$y) 
           
           REF <-  df[df$PRODUCT %in% "REF",]
           TEST <- df[df$PRODUCT %in% "TEST",]
@@ -1288,6 +1292,102 @@ server <- shinyServer(function(input, output) {
         
     }})
     
+    
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # analyse user variance components for plot title
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    vc.user <-  reactive({
+      
+      req(input$file1)
+      df <- read.csv(input$file1$datapath,
+                     header = input$header,
+                     sep = input$sep,
+                     quote = input$quote)
+      
+      df<- as.data.frame(df)
+      
+   #   df$y <- log(df$y)  # log the fda data
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # Conditionally fit the model
+      
+      if (input$Model == "nlme package") {
+        
+        fit.res <-  
+          tryCatch(intervals(lme(y ~ 1, random = ~1 |  PRODUCT/BATCH/SECTOR , data=df, method="REML")), 
+                   error=function(e) e)
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ###http://stackoverflow.com/questions/8093914
+        ###/skip-to-next-value-of-loop-upon-error-in-r-trycatch
+        
+        if (!inherits(fit.res, "error")) {
+          
+          modelint <- fit.res
+          
+          emu      <-p4(modelint[['fixed']][2][[1]])  
+          etop     <-p4(modelint[['reStruct']][['PRODUCT']][2][[1]])
+          eday     <-p4(modelint[['reStruct']][['BATCH']][2][[1]])
+          erun     <-p4(modelint[['reStruct']][['SECTOR']][2][[1]])
+          esigma   <-p4(modelint[['sigma']][2][[1]])
+          
+        } else  {
+          
+          fit.res <- NULL
+          
+        }
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      } else {                   
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        o <- fit.res<- tryCatch(fitVCA(y~PRODUCT/BATCH/SECTOR, df, "reml"), 
+                                error=function(e) e) 
+        
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+        if (!inherits(fit.res, "error")) {
+          
+          fit.res <- VCAinference(fit.res, ci.method = "sas")
+          
+          x <- as.matrix(o)
+          features <- attributes(x)
+          
+          emu      <- p4(features$Mean) 
+          
+          o <- as.matrix(o)
+          etop     <-p4(o["PRODUCT","SD"])
+          eday     <-p4(o["PRODUCT:BATCH","SD"])
+          erun     <-p4(o["PRODUCT:BATCH:SECTOR","SD"])
+          esigma   <-p4(o["error","SD"])
+          
+        } else  {
+          
+          fit.res <- NULL
+          
+        }
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+      }
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+      # Get the model summary
+      if (is.null(fit.res)) {
+        
+        fit.summary <- NULL
+        
+      } else {
+        
+        fit.summary <-  (fit.res)
+      }
+      
+      return(list(emu=emu, etop=etop, eday=eday, erun=erun,
+                  esigma=esigma, fit.res=fit.res, fit.summary=fit.summary))
+      
+    })     
+    
+    
+    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # plotting user uploaded data
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1303,6 +1403,8 @@ server <- shinyServer(function(input, output) {
             
             df<- as.data.frame(df)
             
+           # df$y <- log(df$y)  # log the fda data
+            
             varPlot(y~PRODUCT/BATCH/SECTOR/REP, df, 
                     BG=list(var="PRODUCT", 
                             col=c("#f7fcfd","#e5f5f9","#ccece6","#99d8c9",
@@ -1314,11 +1416,8 @@ server <- shinyServer(function(input, output) {
                     JoinLevels=list(var="SECTOR", col=c("lightblue", "cyan", "yellow"), 
                                     lwd=c(2,2,2)), 
                     MeanLine=list(var="PRODUCT", col="blue", lwd=2),
-                    Title=list(main=paste("Variability Chart. Truth (estimate): intercept ",0,"(",fit.regression()$emu,"), top level sd=",
-                                          input$a,"(",fit.regression()$etop,")", ",\n middle level sd=",
-                                          input$b ,"(",fit.regression()$eday,"), lowest level sd=",
-                                          input$c, "(",fit.regression()$erun,") & random error sd=", 
-                                          input$d,"(",fit.regression()$esigma,")")),
+                    Title=list(main=paste("Variability Chart. Estimate: intercept (", vc.user()$emu,"), top level sd= (",vc.user()$etop,")"
+                                          , ",\n middle level sd= (",vc.user()$eday,"), lowest level sd= (",vc.user()$erun,") & random error sd= (",vc.user()$esigma,")")),
                     
                     # MeanLine=list(var="mid", col="pink", lwd=2),
                     Points=list(pch=list(var="BATCH", pch=c(21, 22, 24)), 
