@@ -11,7 +11,7 @@
     fig.width <- 1200
     fig.height <- 450
     p1 <- function(x) {formatC(x, format="f", digits=1)}
-
+    options(width=100)
 
 
 # This is the FDA data copied from the guidance
@@ -23,7 +23,7 @@
     close(con)
 
     fda2 <- fda.d
-    fda2$fda1 <- exp(fda2$y)  # the bioequiv function logs the data, but the fda data is already logged
+    fda2$exp.y <- exp(fda2$y)  # the bioequiv function logs the data, but the fda data is already logged
     
     
     
@@ -277,7 +277,8 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         colnames(res) <- c("reference scale","constant scale, use this for inference")
     }
     
-    print(kable(res))
+    cat("~~~~~~~~~~~~~~~~Print all the key statistics~~~~~~~~~~~~~~\n")
+     print(kable(res))
     
     cat("\n")
     print(test.note); print(ref.note)
@@ -285,6 +286,8 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     
     accept="FAIL"
     
+    cat("~~~~~~~~~~~~~~~~~~~~~~Conclusion~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    cat("\n")
     if (SIGMAR > sigma_TO) {
         
         if (Hmu1 < 0) {accept="PASS"} else {accept="FAIL"}
@@ -300,8 +303,9 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         # print(exp(x.barT))
         # cat("\nRatio of Geom Means (T/R)\n")
         # print(exp(x.barT)/ exp(x.barR))
-        cat("~~~~~~~~~~~~~~~~Referenced Scaled Approach as SigmaR > 0.1~~~~~~~~~~~~~~")
+        cat("~~~~~~~~~~~~~~~~Referenced Scaled Approach as SigmaR > 0.1~~~~~~~~~~~~~~\n")
         print(kable(result1, digits=12))
+        cat("\n")
         
     } else {
         
@@ -318,8 +322,9 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         # print(exp(x.barT))
         # cat("\nRatio of Geom Means (T/R)\n")
         # print(exp(x.barT)/ exp(x.barR))
-        cat("~~~~~~~~~~~~~~~~Constant Scaled Approach as SigmaR <= 0.1~~~~~~~~~~~~~~")
+        cat("~~~~~~~~~~~~~~~~Constant Scaled Approach as SigmaR <= 0.1~~~~~~~~~~~~~~\n")
         print(kable(result2, digits=12))
+        cat("\n")
         
     }
     
@@ -446,7 +451,7 @@ see notes tab for more information. You also have the choices of selecting a new
                              
                              div(plotOutput("reg.plot", width=fig.width, height=fig.height)),  
                              
-                             p(strong("Model output: arithmetic mean presented above plot when VCA is used otherwise modelled mean
+                             p(strong("Arithmetic mean presented above plot when VCA is used otherwise modelled mean
                                      (arithmetic mean and modelled mean will match with a balanced design)")) ,
                              
                              div( verbatimTextOutput("reg.summary"))
@@ -536,7 +541,7 @@ see notes tab for more information. You also have the choices of selecting a new
                               
                               
                               br(),
-                              tags$a(href = "https://blogs.sas.com/content/iml/2014/06/04/simulate-lognormal-data-with-specified-mean-and-variance.html", "Blog on simulating lognormal data"),
+                             # tags$a(href = "https://blogs.sas.com/content/iml/2014/06/04/simulate-lognormal-data-with-specified-mean-and-variance.html", "Blog on simulating lognormal data"),
                               br(),
                               br(),
                               br()),
@@ -853,8 +858,7 @@ server <- shinyServer(function(input, output) {
         } else {
             
             #VCA plot~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-            #require(VCA)
+             
             varPlot(y~top/mid/low, d1, 
                     BG=list(var="top", 
                             col=c("#f7fcfd","#e5f5f9","#ccece6","#99d8c9",
