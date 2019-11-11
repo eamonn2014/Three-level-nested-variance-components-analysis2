@@ -350,7 +350,7 @@ Suspension Inhalation Product"),
                         div(p("Using R we explore the FDA's PBE statistical analysis procedure (when there are n>1 replicates in 'containers'). FDA Guidance is at the following link:")),  
                         tags$a(href = "https://www.accessdata.fda.gov/drugsatfda_docs/psg/Budesonide_Inhalation_Sus_20929_RC_09-12.pdf", "FDA Bioequivalence Budesonide guidance"),
                         div(p(" ")),
-                        div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given only for the first tab using nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design of the experiment before attempting to analyse.")),
+                        div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design of the experiment before attempting to analyse.")),
                         
                         div(
                             
@@ -370,13 +370,13 @@ Suspension Inhalation Product"),
                             tags$hr(),
                             actionButton("resample", "Simulate a new sample"),
                             br(),br(),
-                            div(strong("Tab 2a Plot and variance components analysis - simulated data")),p("Does just that, plot a balanced design based on the user inputs below"),
+                            div(strong("Tab 2a Plot and variance components analysis - simulated data")),p("Does just that, plot a balanced design based on user inputs, use the slider inputs on this tab"),
                             div(strong("Tab 2b Population Bioequivalence Statistical Analysis - simulated data")),p("Performs the analysis approach based on guidance, but will adjust analysis if negative variance components are encountered. Presents a one way ANOVA on each product, performs PBS analysis and then concludes in a PASS or FAIL"),
                             div(strong("Tab 2c List the simulated data")),p("A simple listing of the simulated data."),
                             tags$hr(),
                             div(strong("Tab 3 Upload your own data for Population Bioequivalence Statistical Analysis")),p("User data can be loaded. PBE analysis takes place, the data plotted and listed. It does not have to be balanced, though it requires a balanced number of replicates within each product. The program will work out the design. Use at your own risk."),
                             tags$hr(),
-                            div(strong("Tab 4 Explanation")),p("An explanation of the analysis"),
+                            div(strong("Tab 4 Explanation")),p("An explanation of the adjustments to the guidance that are performed if negative variance components are encountered. But see the FDA guidance for an explanation of the general approach."),
                             
                             br(),
                             actionButton(inputId='ab1', label="R code here", 
@@ -452,8 +452,8 @@ Suspension Inhalation Product"),
 between green 'mid' groups (within blue groups), within green 'mid' groups, within 'low' groups (replicates), a.k.a. repeatability. 
 So we actually estimate 4 components counting the residual error. Product '1' is taken as the reference product.
 Create a balanced design by reducing all the sliders to one value. 
-The FDA guidance fits a one way ANOVA to each product data with the independent variable the lowest level. 
-The mid level 'batch' is not included in the analysis, however the degrees of freedom are adjusted. 
+The FDA guidance fits a one way ANOVA to each product's data with the independent variable the lowest level factor. 
+The mid level 'batch' is not included in the analysis, however 'batch' is taken into account in the evaluation, the degrees of freedom are used in the analysis. 
 The guidance does not discuss how to proceed in the case in which one or both between variance component(s) is estimated as negative, 
 that's a bit Pepega, we show what to do in those scenarios, see notes tab for more information. You also have the choice of simulating a new sample. ")),
                                      ## new here -----------------------------------------------------------------------------------
@@ -659,12 +659,20 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                          helpText('Therefore if $$MSB_R < MSW_R$$ then')),
                                      
                                      
-                                     HTML(" <strong>$$\\sigma_R =  {\\sqrt{MSW_R}}$$</strong>"),
+                                     
+                                     withMathJax(
+                                         helpText(" $$\\sigma_R =  {\\sqrt{MSW_R}}$$")),
+                                     #HTML(" $$\\sigma_R =  {\\sqrt{MSW_R}}$$"),
                                      
                                      withMathJax(
                                          helpText('and if $$MSB_T < MSW_T$$ then')),
                                      
-                                     HTML(" <strong>$$\\sigma_T =  {\\sqrt{MSW_T}}$$</strong>"),
+                                     
+                                     
+                                     withMathJax(
+                                         helpText(" $$\\sigma_T =  {\\sqrt{MSW_T}}$$")),
+                                     
+                                     # HTML(" $$\\sigma_T =  {\\sqrt{MSW_T}}$$"),
                                      
                                      HTML(" <strong>Impact to Delta and HD</strong>"),
                                     
@@ -674,12 +682,22 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                      withMathJax(
                                          helpText('$$ \\hat{\\Delta} = \\bar{y}_T - \\bar{y}_R$$')),
                                      
+                                     
+                                  
+                                     br(),
+                                     
+                                     
+                                     withMathJax(
+                                         helpText("We have")),
+                                     
                                      withMathJax(
                                          helpText('$$Var(\\bar{y}_T) = \\frac{\\sigma^2_B}{n.l}  +  \\frac{\\sigma^2_W}{n.l.m}  = \\frac{m\\sigma^2_B + \\sigma^2_W}{n.l.m} = \\frac{MSB_T}{n.l.m} $$')),
                                      
                                      withMathJax(
                                          helpText("with degrees of freedom $$n_T.l_T-1$$")),
-                                     
+                                     br(),
+                                     withMathJax(
+                                         helpText("We have")),
                                      withMathJax(
                                          helpText('$$Var(\\bar{y}_R) = \\frac{\\sigma^2_B}{n.l}  +  \\frac{\\sigma^2_W}{n.l.m}  = \\frac{m\\sigma^2_B + \\sigma^2_W}{n.l.m} = \\frac{MSB_R}{n.l.m} $$')),
                                      
@@ -714,8 +732,7 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                         helpText("with degrees of freedom $$n_R.l_R.(m-1)$$")),
                                     
                                     withMathJax(
-                                        helpText("and so depending on if one or both products has a single variance component, there are four scenarios for the calculation of HD in the guidance:")),
-                                    
+                                        helpText("and so depending on if one or both products has a single variance component, there are four scenarios for the calculation of HD including the one in the guidance:")),
                                     
                                     withMathJax(
                                         helpText("I) Both have non negative variance components:")),
@@ -759,7 +776,7 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                     withMathJax(
                                         helpText("$$E1 + E2 = \\frac{MSB_T}{m} + \\frac{(m-1) MSW_T }{m } = \\frac{MSB_T - MSW_T }{m}  +  MSW_T = \\hat{\\sigma^2_B} + \\hat{\\sigma^2_W}$$ 
                                                  which is the total variance of test products. 
-                                                 If we encounter a negative between variance component for the test we have shown above the total variance is estimated by the mean squares within. 
+                                                 If we encounter a negative between variance component for the test product we have shown above the total variance is estimated by the mean squares within. 
                                                  
                                                  So let $$E1 = 0, E2 = MSW_T$$ and H2 and U2 are unaltered.")), 
                                     
@@ -774,7 +791,7 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                         MSW_R\\right) = -(1+\\theta_p)\\left(\\hat{\\sigma^2_B} + \\hat{\\sigma^2_W}\\right)$$ 
                                         
                                                  
-                                                 If we encounter a negative between variance component for the reference we have shown above the total variance is estimated by the mean squares within. 
+                                                 If we encounter a negative between variance component for the reference product we have shown above the total variance is estimated by the mean squares within. 
                                                  
                                                  So let $$E3s = 0, E4s = -(1+\\theta_p)MSW_R$$ and H4s and U4s are unaltered.")), 
                                     
@@ -788,7 +805,7 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                         helpText("$$E3c + E4c = -\\frac{MSB_R}{m} + \\frac{(m-1) MSW_R }{m } = -\\left(\\frac{MSB_R - MSW_R }{m}  +  MSW_R\\right) = -\\left(\\hat{\\sigma^2_B} +
                                         \\hat{\\sigma^2_W}\\right)$$ 
                                                    
-                                                 If we encounter a negative between variance component for the test we have shown above the total variance is estimated by the mean squares within. 
+                                                 If we encounter a negative between variance component for the test product we have shown above the total variance is estimated by the mean squares within. 
                                                  
                                                  So let $$E3c = 0, E4c = -MSW_R$$ and H4c and U4c are unaltered.")), 
                                      
