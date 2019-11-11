@@ -6,10 +6,17 @@ library(VCA)
 options(max.print=1000000)
 fig.width <- 1200
 fig.height <- 450
+library(shinythemes)        # more funky looking apps
 p1 <- function(x) {formatC(x, format="f", digits=1)}
 
 
-ui <-shinyUI(pageWithSidebar(
+
+
+ui <- fluidPage(theme = shinytheme("journal"),
+                
+                shinyUI(pageWithSidebar(
+
+#ui <-shinyUI(pageWithSidebar(
     
     headerPanel("Three level nested variance components analysis"),
     
@@ -59,7 +66,7 @@ So we actually estimate 4 components counting the residual error. Create a balan
             
             sliderInput("top",
                         "Number of levels of top component (demarked by blue or thick lines)",
-                        min=2, max=100, step=1, value=3, ticks=FALSE),
+                        min=2, max=100, step=1, value=4, ticks=FALSE),
             
             sliderInput("range1", "Middle level: randomly select no of 'mid' groups within each top level group:", 
                         min = 2, max = 10, value = c(2, 10), ticks=FALSE) ,
@@ -92,8 +99,22 @@ So we actually estimate 4 components counting the residual error. Create a balan
     mainPanel(
         
       #~~~~~~~~~~~~~
-      tabsetPanel(type = "tabs", 
-                  
+  #    tabsetPanel(type = "tabs", 
+                  navbarPage(       
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+                    tags$style(HTML(" 
+        .navbar-default .navbar-brand {color: cyan;}
+        .navbar-default .navbar-brand:hover {color: blue;}
+        .navbar { background-color: lightgrey;}
+        .navbar-default .navbar-nav > li > a {color:black;}
+        .navbar-default .navbar-nav > .active > a,
+        .navbar-default .navbar-nav > .active > a:focus,
+        .navbar-default .navbar-nav > .active > a:hover {color: pink;background-color: purple;}
+        .navbar-default .navbar-nav > li > a:hover {color: black;background-color:yellow;text-decoration:underline;}
+        .navbar-default .navbar-nav > li > a[data-value='t1'] {color: red;background-color: pink;}
+        .navbar-default .navbar-nav > li > a[data-value='t2'] {color: blue;background-color: lightblue;}
+        .navbar-default .navbar-nav > li > a[data-value='t3'] {color: green;background-color: lightgreen;}
+                   ")), 
         #~~~~~~~~~~~~          
         tabPanel("Plot and analysis", 
         
@@ -126,7 +147,7 @@ So we actually estimate 4 components counting the residual error. Create a balan
     
 )
 )
-
+)
 
 server <- shinyServer(function(input, output) {
     
