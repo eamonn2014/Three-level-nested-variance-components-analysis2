@@ -328,7 +328,7 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         print(kable(result2, digits=12))
         cat("\n")
         
-    }
+    } 
     
 }
 
