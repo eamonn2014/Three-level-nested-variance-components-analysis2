@@ -49,7 +49,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                   The middle, lowest and replicate numbers are varied randomly based on the slider ranges. The variance components are between blue 'top' groups,
 between green 'mid' groups (within blue groups), within green 'mid' groups, within 'low' groups (replicates), aka repeatability. 
 So we actually estimate 4 components counting the residual error. Create a balanced design by reducing all the sliders to one value.
-                  You also have the choices of selecting a new sample. ")),
+                  You also have the choices of simulating a new sample. ")),
 
         
             br(),
@@ -120,8 +120,8 @@ So we actually estimate 4 components counting the residual error. Create a balan
         
         div(plotOutput("reg.plot", width=fig.width, height=fig.height)),  
     
-        p(strong("Model output: arithmetic mean presented above plot when VCA is used otherwise modelled mean
-                 (artithmetic mean and modelled mean will match with a balanced design)")) ,
+        p(strong("Arithmetic mean is presented above plot when VCA package is used, otherwise the modelled mean is presented.
+                 (Artithmetic mean and modelled mean will match with a balanced design)")) ,
         
         div( verbatimTextOutput("reg.summary"))
         
