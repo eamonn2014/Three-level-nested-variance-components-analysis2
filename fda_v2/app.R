@@ -60,6 +60,9 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     mydata$Container <- as.factor(mydata[,indep])
     mydata$y <- mydata[,response]
     mydata$Product <- mydata[,split]
+    
+    if(min(mydata$y) > 0) {   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~# 
+    
     mydata$y <- log(mydata$y)
     
     # create a slim dataset
@@ -328,7 +331,11 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         print(kable(result2, digits=12))
         cat("\n")
         
-    } 
+    } } else {
+        warn1 <- c("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Negative values in response data not allowed ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        warn2 <- c("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(warn2);print(warn2);print(warn1);print(warn2)
+        }
     
 }
 
@@ -348,7 +355,7 @@ Suspension Inhalation Product"),
                     sidebarPanel(
                         
                         div(p("Using R we explore the FDA's PBE statistical analysis procedure (when there are n>1 replicates in 'containers'). FDA Guidance is at the following link:")),  
-                        tags$a(href = "https://www.accessdata.fda.gov/drugsatfda_docs/psg/Budesonide_Inhalation_Sus_20929_RC_09-12.pdf", "FDA Bioequivalence Budesonide guidance"),
+                        tags$a(href = "https://www.accessdata.fda.gov/drugsatfda_docs/psg/Budesonide_Inhalation_Sus_20929_RC_09-12.pdf", "FDA Draft Guidance on Budesonide"),
                         div(p(" ")),
                         div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design of the experiment before attempting to analyse.")),
                         
@@ -366,7 +373,7 @@ Suspension Inhalation Product"),
                             br(),br(),
                             div(strong("Tab 1a Plot the FDA example guidance data")),p("The example FDA dataset is plotted (always plot data), variance components are estimated for non subsetted data, just for interest."),
                             div(strong("Tab 1b FDA Population Bioequivalence Statistical Analysis")),p("Reproduces the FDA analysis as presented in the guidance, notice differences in decimal places."),
-                            div(strong("Tab 1c List the FDA example guidance data")),p("A simple listing of the FDA example data."),
+                            div(strong("Tab 1c List the FDA guidance example data")),p("A simple listing of the FDA example data."),
                             tags$hr(),
                             actionButton("resample", "Simulate a new sample"),
                             br(),br(),
@@ -432,7 +439,7 @@ Suspension Inhalation Product"),
                                      
                             ) ,
                             #~~~~~~~~~~~~~
-                            tabPanel("1c List the FDA example guidance data", 
+                            tabPanel("1c List the FDA guidance example data", 
                                      
                                      div( verbatimTextOutput("bioequivfda2")), #
                                      
@@ -637,7 +644,7 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                       
                                      p("It is not uncommon that the mean square between (MSB) is less than the mean square within (MSW) with a one way ANOVA. This results in a negative estimate 
                                      for the between variance component. 
-                             Thus concluding there is no additional variability due to the between variance component. In such cases the FDA PBE equations are then adjusted. We have m replicates, 
+                             Thus concluding there is no additional variability due to the between variance component. In such cases the FDA PBE equations are adjusted. We have m replicates, 
                              n items per batch and l is the no batches per product (test and reference). Refer to the FDA guidance document."),
                                      br(),
                                      
@@ -940,7 +947,7 @@ server <- shinyServer(function(input, output) {
         data <- make.regression()
         
         df <- data$df
-        
+
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Conditionally fit the model
         
@@ -1014,7 +1021,7 @@ server <- shinyServer(function(input, output) {
         }
         
         return(list(emu=emu, etop=etop, eday=eday, erun=erun,
-                    esigma=esigma, fit.res=fit.res, fit.summary=fit.summary))
+                    esigma=esigma, fit.res=fit.res, fit.summary=fit.summary)) 
         
     })     
     
@@ -1194,7 +1201,7 @@ server <- shinyServer(function(input, output) {
             yyy <-d1$SECTOR[yyy]
             
             plot( y ~ factor(SECTOR), data=d1 , 
-                  main=paste("Variability Chart of FDA data. (Estimate): intercept (",vc.fda()$emu,"), top level sd=(",vc.fda()$etop,")", 
+                  main=paste("Variability Chart of FDA data. (Estimate in brackets): intercept (",vc.fda()$emu,"), top level sd=(",vc.fda()$etop,")", 
                              ",\n middle level sd=(",vc.fda()$eday,"), lowest level sd=(",vc.fda()$erun,") & random error sd=("
                              ,vc.fda()$esigma,")"),
                   main="lowest level grouped", xlab="lowest level groups", ylab="Guidance response (log y)")
@@ -1221,7 +1228,7 @@ server <- shinyServer(function(input, output) {
                     JoinLevels=list(var="SECTOR", col=c("lightblue", "cyan", "yellow"), 
                                     lwd=c(2,2,2)), 
                     MeanLine=list(var="PRODUCT", col="blue", lwd=2),
-                    Title=list(main=paste("Variability Chart of FDA data. (Estimate): intercept (",vc.fda()$emu,"), top level sd=(",vc.fda()$etop,")", 
+                    Title=list(main=paste("Variability Chart of FDA data. (Estimate in brackets): intercept (",vc.fda()$emu,"), top level sd=(",vc.fda()$etop,")", 
                                           ",\n middle level sd=(",vc.fda()$eday,"), lowest level sd=(",vc.fda()$erun,") & random error sd=("
                                           ,vc.fda()$esigma,")")),
                     

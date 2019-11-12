@@ -24,7 +24,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
      
         div(p("Frequentist variance component modelling and a plot of the data. A choice of plots is given, a base plot or a plot using the VCA package 
               (VCA plot shows individual data points rather than boxplots of replicate distributions). A choice of modelling is given, estimation using nlme or VCA package. 
-              The difference in the two is in the variance components confidence interval calculations.")),
+              The difference in the two is in the variance components confidence interval calculation approach.")),
         
         div(
             
@@ -120,7 +120,7 @@ So we actually estimate 4 components counting the residual error. Create a balan
         
         div(plotOutput("reg.plot", width=fig.width, height=fig.height)),  
     
-        p(strong("Arithmetic mean is presented above plot when VCA package is used, otherwise the modelled mean is presented.
+        p(strong("Arithmetic mean is presented as the intercept above the plot when VCA package is used, otherwise the modelled mean is presented.
                  (Artithmetic mean and modelled mean will match with a balanced design)")) ,
         
         div( verbatimTextOutput("reg.summary"))
