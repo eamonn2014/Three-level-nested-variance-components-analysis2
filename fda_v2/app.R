@@ -40,9 +40,7 @@ fda2$exp.y <- exp(fda2$y)  # the bioequiv function logs the data, but the fda da
 
 
 bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
-                    response="ISM",indep="CONTAIN", split="PRODUCT", ref="REF", test="TEST"
-                    
-) {
+                    response="ISM",indep="CONTAIN", split="PRODUCT", ref="REF", test="TEST") {
     
     mydata<- foo1
     
@@ -61,14 +59,21 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
     mydata$y <- mydata[,response]
     mydata$Product <- mydata[,split]
     
-    if(min(mydata$y) > 0) {   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~# 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
+    if( min(mydata$y) > 0 ) { # this checks if all the data are positive, lab values should not be negative.
+        
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
     mydata$y <- log(mydata$y)
     
     # create a slim dataset
     tmp <- mydata
     foo <- mydata[, c("Product", "Container", "y", "SECTOR")]
     mydata<- foo
+    
+    #if (length(unique(mydata$y)) > 1) {  # cater for the eventuality of 1 rep in a sector
+    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     # print and plot the data
     tmp <- tmp[, c("Product", "Container", "y", "SECTOR", "BATCH")]
