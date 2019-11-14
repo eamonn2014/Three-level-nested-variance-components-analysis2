@@ -805,6 +805,19 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                 the bottom two options are to swap between analysis and a plot. Ensure your data is balanced. 
                                 Once uploaded, toggle between the 'analysis' and 'output' radio buttons. Use at your own risk.")) ,
                                      
+                                     p(("Example datasets:")) ,
+                                     
+                                     tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda", "FDA example data set in guidance [1]"),
+                                     div(p(" ")),
+                                     
+                                     tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda%20B%20rep%20only", "The same FDA data set with only 1 rep per cannister"),
+                                     div(p(" ")),
+                                     
+                                     
+                                     
+                                     
+                                     
+                                     
                                      sidebarLayout(
                                          
                                          # Sidebar panel for inputs ----
