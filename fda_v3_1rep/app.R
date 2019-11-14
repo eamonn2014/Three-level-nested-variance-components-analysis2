@@ -565,7 +565,7 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
             cat("\n")
             
         } } else {
-            warn1 <- c("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Negative values in response data not allowed ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            warn1 <- c("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Negative values in response data not allowed ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~") 
             warn2 <- c("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             print(warn2);print(warn2);print(warn1);print(warn2)
         }
@@ -586,8 +586,8 @@ Suspension Inhalation Product"),
                     
                     sidebarPanel(
                         
-                        div(p("Using R we explore the FDA Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide
-Suspension Inhalation Product [1]")),  
+                        div(p("Using R we explore the 'FDA Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide
+Suspension Inhalation Product' [1]")),  
                         div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design and execution of the experiment before attempting to analyse.")),
                         
                         div(
@@ -800,11 +800,11 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                             tabPanel("3 Upload your own data for Population Bioequivalence Statistical Analysis", fluid = TRUE,
                                      
                                      p(("Upload your own data for determination of population bioequivalence. 
-                                The top two radio buttons options are to help load,
-                                the bottom two options are to either show 6 rows of the data or all the data and secondly to swap between analysis and a plot of the data. Ensure your data is balanced. 
-                                Once uploaded, toggle between the 'analysis' and 'plot' option radio button. Use at your own risk.")) ,
+                                The top two radio button options are to help load,
+                                the bottom two options are to either show the top six rows of the data or show all the data, and secondly to toggle between PBE analysis or a plot of the data. 
+                                 Ensure your data is balanced within product. Use at your own risk.")) ,
                                      
-                                     p(("Example datasets (download either file and click 'Browse...' to locate it on your PC):")) ,
+                                     p(("Example data sets (download either file and click 'Browse...' to locate it on your PC):")) ,
                                      
                                      tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda", "FDA example data set in guidance [1]"),
                                      div(p(" ")),
@@ -896,8 +896,9 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
 variances are estimated as the between canister variance of the 'super-batch' consisting of the three
 batches combined [2]. It is not uncommon that the mean square between (MSB) is less than the mean square within (MSW) with a one way ANOVA. This results in a negative estimate 
                                      for the between variance component. 
-                             Thus concluding there is no additional variability due to the between variance component. In such cases the FDA PBE equations are adjusted. We have m replicates, 
-                             n items per batch and l is the no batches per product (test and reference). Refer to the FDA guidance document."),
+                             Thus concluding there is no additional variability due to the between variance component. In such cases the FDA PBE equations are adjusted. 
+                             We have",HTML(" <em>m</em>"),"replicates, 
+                             ",HTML(" <em>n</em>")," items per batch and",HTML(" <em>l</em>"),"is the no batches per product (test and reference). Refer to the FDA guidance document."),
                                      br(),
                                      
                                      
