@@ -588,7 +588,7 @@ Suspension Inhalation Product"),
                         
                         div(p("Using R we explore the FDA Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide
 Suspension Inhalation Product [1]")),  
-                        div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design of the experiment before attempting to analyse.")),
+                        div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design and execution of the experiment before attempting to analyse.")),
                         
                         div(
                             
@@ -800,10 +800,9 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                             tabPanel("3 Upload your own data for Population Bioequivalence Statistical Analysis", fluid = TRUE,
                                      
                                      p(("Upload your own data for determination of population bioequivalence. 
-                                Please prepare an input file with the names 'BATCH'	'SECTOR' 'REP' 'PRODUCT' and 'y', 
-                                see 'Tab 1c List the FDA example guidance data'. The top two radio buttons options are to help load,
-                                the bottom two options are to swap between analysis and a plot. Ensure your data is balanced. 
-                                Once uploaded, toggle between the 'analysis' and 'output' radio buttons. Use at your own risk.")) ,
+                                The top two radio buttons options are to help load,
+                                the bottom two options are to either show 6 rows of the data or all the data and secondly to swap between analysis and a plot of the data. Ensure your data is balanced. 
+                                Once uploaded, toggle between the 'analysis' and 'plot' option radio button. Use at your own risk.")) ,
                                      
                                      p(("Example datasets (download either file and click 'Browse...' to locate it on your PC):")) ,
                                      
