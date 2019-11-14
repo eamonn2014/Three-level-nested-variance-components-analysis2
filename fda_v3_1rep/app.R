@@ -799,13 +799,13 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                   
                             tabPanel("3 Upload your own data for Population Bioequivalence Statistical Analysis", fluid = TRUE,
                                      
-                                     p(("Upload your own data for determination of PBE equivalence. 
+                                     p(("Upload your own data for determination of population bioequivalence. 
                                 Please prepare an input file with the names 'BATCH'	'SECTOR' 'REP' 'PRODUCT' and 'y', 
                                 see 'Tab 1c List the FDA example guidance data'. The top two radio buttons options are to help load,
                                 the bottom two options are to swap between analysis and a plot. Ensure your data is balanced. 
                                 Once uploaded, toggle between the 'analysis' and 'output' radio buttons. Use at your own risk.")) ,
                                      
-                                     p(("Example datasets:")) ,
+                                     p(("Example datasets (download either file and click 'Browse...' to locate it on your PC):")) ,
                                      
                                      tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda", "FDA example data set in guidance [1]"),
                                      div(p(" ")),
@@ -815,14 +815,14 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                      
                                      
                                      
-                                     
+                                    # browseURL('https://www.r-project.org', browser = getOption("browser"), encodeIfNeeded = FALSE),
                                      
                                      
                                      sidebarLayout(
                                          
                                          # Sidebar panel for inputs ----
                                          sidebarPanel(
-                                             
+                                            
                                              # Input: Select a file ----
                                              fileInput("file1", "Choose CSV File",
                                                        multiple = TRUE,
