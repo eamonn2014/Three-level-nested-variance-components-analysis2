@@ -1,5 +1,7 @@
 #
 # This is a Shiny web application. test data files for user '1 rep data' this the fda for B rep only and 'fda'
+# https://github.com/eamonn2014/Three-level-nested-variance-components-analysis2/blob/master/fda
+# https://github.com/eamonn2014/Three-level-nested-variance-components-analysis2/blob/master/fda%20B%20rep%20onl
  
 # updating original app
 # Rshiny ideas from on https://gallery.shinyapps.io/multi_regression/
@@ -579,15 +581,14 @@ ui <- fluidPage(theme = shinytheme("journal"),
                 
                 shinyUI(pageWithSidebar(
                     
-                    headerPanel("FDA  Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide
+                    headerPanel("FDA Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide
 Suspension Inhalation Product"),
                     
                     sidebarPanel(
                         
-                        div(p("Using R we explore the FDA's PBE statistical analysis procedure. FDA Guidance is at the following link:")),  
-                        tags$a(href = "https://www.accessdata.fda.gov/drugsatfda_docs/psg/Budesonide_Inhalation_Sus_20929_RC_09-12.pdf", "FDA Draft Guidance on Budesonide"),
-                        div(p(" ")),
-                        div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis (for n=1 and n>1 replicates). A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design of the experiment before attempting to analyse.")),
+                        div(p("Using R we explore the FDA Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide
+Suspension Inhalation Product [1]")),  
+                        div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design of the experiment before attempting to analyse.")),
                         
                         div(
                             
@@ -621,7 +622,14 @@ Suspension Inhalation Product"),
                                          onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis/master/three-level-nested-variance-components-analysis/app.R', '_blank')"),
                             
                             br(),
-                            br()
+                            br(),
+                            div(p("References:")),  
+                            
+                            tags$a(href = "https://www.accessdata.fda.gov/drugsatfda_docs/psg/Budesonide_Inhalation_Sus_20929_RC_09-12.pdf", "[1] FDA Draft Guidance on Budesonide"),
+                            div(p(" ")),
+                            
+                            tags$a(href = "https://www.fda.gov/media/70878/download", "[2] Statistical Information from the June 1999 Draft Guidance and Statistical Information for In Vitro Bioequivalence Data Posted on August 18, 1999"),
+                            div(p(" "))
                             
                         ))
                     ,  
@@ -872,7 +880,9 @@ that's a bit Pepega, we show what to do in those scenarios, see notes tab for mo
                                      HTML(" <strong>When the between variance component is estimated to be negative we apply the following adjustments.</strong>"),
                                      
                                      
-                                     p("It is not uncommon that the mean square between (MSB) is less than the mean square within (MSW) with a one way ANOVA. This results in a negative estimate 
+                                     p("Since three batches is not sufficient to reliably estimate the between batch component, the total
+variances are estimated as the between canister variance of the 'super-batch' consisting of the three
+batches combined [2]. It is not uncommon that the mean square between (MSB) is less than the mean square within (MSW) with a one way ANOVA. This results in a negative estimate 
                                      for the between variance component. 
                              Thus concluding there is no additional variability due to the between variance component. In such cases the FDA PBE equations are adjusted. We have m replicates, 
                              n items per batch and l is the no batches per product (test and reference). Refer to the FDA guidance document."),
