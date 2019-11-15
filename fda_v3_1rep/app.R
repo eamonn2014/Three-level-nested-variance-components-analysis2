@@ -557,7 +557,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                     headerPanel("FDA Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide Suspension Inhalation Product"),
                     
                     sidebarPanel(
-                        
+                        strong("Introduction"),
                         div(p("Using R we explore the 'FDA Population Bioequivalence (PBE) Statistical Analysis Procedure Used in Bioequivalence Determination of Budesonide Suspension Inhalation Product' [1]")),  
                         div(p("We analyse the FDA guidance example, replicating the guidance results. We also simulate data and perform the PBE analysis. There is also an option to upload your own data for PBE analysis. A choice of plots is given, a base R plot or a plot using the VCA package. A choice of modelling is given for the tabs 1a and 2a, using the nlme or VCA package. The difference in the two is in the variance components confidence interval calculations. It is advisable to understand the subject matter and understand the design and execution of the experiment before attempting to analyse.")),
                         
