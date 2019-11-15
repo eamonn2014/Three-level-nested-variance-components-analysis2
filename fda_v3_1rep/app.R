@@ -585,7 +585,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                             tags$hr(),
                             div(strong("Tab 3 Upload your own data for Population Bioequivalence Statistical Analysis")),p("User data can be loaded. PBE analysis takes place, the data plotted and listed. It does not have to be balanced, though it requires a balanced number of replicates within each product. The program will work out the design. Use at your own risk."),
                             tags$hr(),
-                            div(strong("Tab 4 Explanation")),p("An explanation of the adjustments to the guidance that are performed if negative variance components are encountered. But see the FDA guidance for an explanation of the general approach."),
+                            div(strong("Tab 4 Explanation")),p("An explanation of the adjustments to the guidance that are performed if negative variance components are encountered. See the FDA guidance for an explanation of the general approach [1]."),
                             
                             br(),
                             actionButton(inputId='ab1', label="R code here", 
@@ -771,7 +771,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                  the bottom two options are to either show the top six rows of the data or show all the data, and secondly to toggle between PBE analysis or a plot of the data. 
                                  Ensure your data is balanced within product. Use at your own risk.")) ,
                                      
-                                     p(("Example data sets (download either file and click 'Browse...' to locate it on your PC):")) ,
+                                     p(("Example data sets (download either file and click 'Browse...' to locate and upload for PBE analysis):")) ,
                                      
                                      tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda", "FDA example data set in guidance [1]"),
                                      div(p(" ")),
