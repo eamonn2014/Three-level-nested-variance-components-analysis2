@@ -111,14 +111,14 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         if (ref$NegVCmsg %in% "* VC set to 0") {
             
             SIGMAR <- sqrt(RMSW) # Should use this if between is zero
-            ref.note <- "ref: the between variance component was set to zero"
+            ref.note <- "reference: the between variance component was set to zero"
             ref.between = 0
             
         } else {
             
             SIGMAR <- ( RMSB/mr + ((mr-1)*RMSW)/mr )^.5 # 
             ref.between = 1
-            ref.note <- "ref: the between variance component was measurable"
+            ref.note <- "reference: the between variance component was measurable"
             
         }
         
@@ -232,7 +232,7 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         # Conclusion
         # print all key results for cross checking
         rel <- c(response, indep, nrXlr , mr , ntXlt , mt ,
-                 x.barR, x.barT, x.barT-x.barR,
+                 x.barR, x.barT, (x.barT-x.barR)^2,
                  SIGMAR, SIGMAT, SIGMAT/SIGMAR,
                  exp(x.barR), exp(x.barT), exp(x.barT)/exp(x.barR), 
                  HD, EQ, Hmu1)
@@ -244,21 +244,21 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
         
         rownames(res) <- c("Response variable (logged for analysis)", 
                            "ANOVA independent variable",
-                           "containers x no of batches, ref",
-                           "reps in ref containers", 
+                           "containers x no of batches, reference",
+                           "reps in reference containers", 
                            "containers x no of batches, test",
                            "reps in test containers",
-                           "Mean of the logged ref", 
+                           "Mean of the logged reference", 
                            "Mean of the logged test", 
-                           "Mean log test-Mean log ref",
+                           "ED: (Mean log test-Mean log reference)^2",
                            "Sigma total log reference (SigmaR)",
                            "Sigma total log test",
                            "Sigma total log test/log reference",
-                           "GM ref", "GM test", 
-                           "GM ratio T/R",
+                           "Geometric mean reference", "Geometric mean test", 
+                           "Geometric mean ratio test/reference",
                            "HD", 
-                           "Point Est." ,
-                           "Upp 95%CI scale")
+                           "Linearized point estimate" ,
+                           "95% upper confidence bound for linearized criteria")
         
         if (SIGMAR > sigma_TO) {
             colnames(res) <- c("reference scale, use this for inference","constant scale")
@@ -281,7 +281,7 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
             
             if (Hmu1 < 0) {accept="PASS"} else {accept="FAIL"}
             result1 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQ, Hmu1, accept))
-            names(result1) <- c("Total SD Reference", " FDA constant", " linearized ref. scale point estimate", " upper 95% conf band", " upper 95% conf band <0?")
+            names(result1) <- c("Total SD Reference", " FDA constant", " linearized ref. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
             # cat("\nTest ANOVA\n")
             # print(TANOVA)
             # cat("\nReference ANOVA\n")
@@ -300,7 +300,7 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
             
             if (Hmu2 < 0) {accept="PASS"} else {accept="FAIL"} 
             result2 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQc, Hmu2, accept))
-            names(result2) <- c("Total SD Reference", " FDA constant", " linearized const. scale point estimate", " upper 95% conf band", " upper 95% conf band <0?")
+            names(result2) <- c("Total SD Reference", " FDA constant", " linearized const. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
             # cat("\nTest ANOVA\n")
             # print(TANOVA)
             # cat("\nReference ANOVA\n")
@@ -456,7 +456,7 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
         # Conclusion
         # print all key results for cross checking
         rel <- c(response, indep, nrXlr , mr , ntXlt , mt ,
-                 x.barR, x.barT, x.barT-x.barR,
+                 x.barR, x.barT, (x.barT-x.barR)^2,
                  SIGMAR, SIGMAT, SIGMAT/SIGMAR,
                  exp(x.barR), exp(x.barT), exp(x.barT)/exp(x.barR), 
                  HD, EQ, Hmu1)
@@ -468,21 +468,21 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
         
         rownames(res) <- c("Response variable (logged for analysis)", 
                            "ANOVA independent variable",
-                           "containers x no of batches, ref",
-                           "reps in ref containers", 
+                           "containers x no of batches, reference",
+                           "reps in reference containers", 
                            "containers x no of batches, test",
                            "reps in test containers",
-                           "Mean of the logged ref", 
+                           "Mean of the logged reference", 
                            "Mean of the logged test", 
-                           "Mean log test-Mean log ref",
+                           "ED: (Mean log test-Mean log reference)^2",
                            "Sigma total log reference (SigmaR)",
                            "Sigma total log test",
                            "Sigma total log test/log reference",
-                           "GM ref", "GM test", 
-                           "GM ratio T/R",
+                           "Geometric mean reference", "Geometric mean test", 
+                           "Geometric mean ratio test/reference",
                            "HD", 
-                           "Point Est." ,
-                           "Upp 95%CI scale")
+                           "Linearized point estimate" ,
+                           "95% upper confidence bound for linearized criteria")
         
         if (SIGMAR > sigma_TO) {
             colnames(res) <- c("reference scale, use this for inference","constant scale")
@@ -503,7 +503,7 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
             
             if (Hmu1 < 0) {accept="PASS"} else {accept="FAIL"}
             result1 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQ, Hmu1, accept))
-            names(result1) <- c("Total SD Reference", " FDA constant", " linearized ref. scale point estimate", " upper 95% conf band", " upper 95% conf band <0?")
+            names(result1) <- c("Total SD Reference", " FDA constant", " linearized ref. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
             # cat("\nTest ANOVA\n")
             # print(TANOVA)
             # cat("\nReference ANOVA\n")
@@ -522,7 +522,7 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
             
             if (Hmu2 < 0) {accept="PASS"} else {accept="FAIL"} 
             result2 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQc, Hmu2, accept))
-            names(result2) <- c("Total SD Reference", " FDA constant", " linearized const. scale point estimate", " upper 95% conf band", " upper 95% conf band <0?")
+            names(result2) <- c("Total SD Reference", " FDA constant", " linearized const. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
             # cat("\nTest ANOVA\n")
             # print(TANOVA)
             # cat("\nReference ANOVA\n")
@@ -1475,11 +1475,11 @@ server <- shinyServer(function(input, output) {
         
         foo8 <- fda.d
         
-        foo8$fda1 <- exp(foo8$y)  # the bioequiv function logs the data, but the fda data is already logged
+        foo8$y <- exp(foo8$y)  # the bioequiv function logs the data, but the fda data is already logged
         
         res.fda <- bioequiv(foo1=foo8 , nrXlr=10*3, mr= 3, 
                             ntXlt=10*3, mt= 3,
-                            response="fda1",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
+                            response="y",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
         
         return(res.fda)
     })
