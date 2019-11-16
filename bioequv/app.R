@@ -454,6 +454,31 @@ see notes tab for more information. You also have the choices of selecting a new
                     #~~~~~~~~~~~~          
                     tabPanel("1a Plot and variance components analysis - simulated data", 
                              
+                             ## here
+                             # 
+                             # sidebarLayout(
+                             # # Sidebar panel for inputs ----
+                             # sidebarPanel(
+                             # 
+                             #   sliderInput("intercept",
+                             #               "True intercept",
+                             #               min=0, max=1000, step=.5, value=700, ticks=FALSE)
+                             # 
+                             # ),
+                             # 
+                             # # Main panel for displaying outputs ----
+                             # mainPanel(
+                             # 
+                             #   div(plotOutput("reg.plot", width=fig.width, height=fig.height)),
+                             # 
+                             #   p(strong("Arithmetic mean presented above plot when VCA is used otherwise modelled mean
+                             #        (arithmetic mean and modelled mean will match with a balanced design)")) ,
+                             # 
+                             #   div( verbatimTextOutput("reg.summary"))
+                             # 
+                             # )),
+                             ## to here
+                             
                              div(plotOutput("reg.plot", width=fig.width, height=fig.height)),  
                              
                              p(strong("Arithmetic mean presented above plot when VCA is used otherwise modelled mean
