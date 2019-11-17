@@ -132,7 +132,7 @@ So we actually estimate 4 components counting the residual error. Create a balan
                  
           div( verbatimTextOutput("summary2")),
        
-         p(strong("copy the above data to do your own analysis................."))
+         p(strong("copy the above data to do your own analysis..."))
 
         
         )
