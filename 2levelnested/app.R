@@ -195,7 +195,7 @@ server <- shinyServer(function(input, output) {
             
         } else {
             
-            replicates <-  sample(c(x5:x6),   sum(lower), replace=TRUE )
+            replicates <-  sample(c(x5:x6),   sum(lower), replace=TRUE ) 
             
         }
         
