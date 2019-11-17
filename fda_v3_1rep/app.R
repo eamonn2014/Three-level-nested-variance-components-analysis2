@@ -668,22 +668,22 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                                      column(4,
                                                             sliderInput("a",
                                                                         "True top level SD",
-                                                                        min=1, max=100, step=.5, value=75, ticks=FALSE))
+                                                                        min=0, max=100, step=.5, value=75, ticks=FALSE))
                                                  ),
                                                  
                                                  fluidRow(
                                                      column(4,
                                                             sliderInput("b",
                                                                         "True middle level SD",
-                                                                        min=1, max=100, step=.5, value=1, ticks=FALSE)),
+                                                                        min=0, max=100, step=.5, value=1, ticks=FALSE)),
                                                      column(4,
                                                             sliderInput("c",
                                                                         "True lower level SD",
-                                                                        min=1, max=100, step=.5, value=1, ticks=FALSE)),
+                                                                        min=0, max=100, step=.5, value=1, ticks=FALSE)),
                                                      column(4,
                                                             sliderInput("d",
                                                                         "True error",
-                                                                        min=1, max=100, step=.5, value=75, ticks=FALSE))
+                                                                        min=0, max=100, step=.5, value=75, ticks=FALSE))
 
                                                  )
                                              )
