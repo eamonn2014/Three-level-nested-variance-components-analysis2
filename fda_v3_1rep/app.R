@@ -33,8 +33,8 @@
 # function inputs:
 # here is my function for performing the analysis
 # data
-# the number of cannisters in a batch x number of batches (separately for test and ref)
-# number of reps in each cannister (separately for test and ref))
+# the number of canisters in a batch x number of batches (separately for test and ref)
+# number of reps in each canister (separately for test and ref))
 # the response variable
 # the independent variable
 # the variable that identifies the test and refernce data
@@ -282,16 +282,6 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
             if (Hmu1 < 0) {accept="PASS"} else {accept="FAIL"}
             result1 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQ, Hmu1, accept))
             names(result1) <- c("Total SD Reference", " FDA constant", " linearized ref. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
-            # cat("\nTest ANOVA\n")
-            # print(TANOVA)
-            # cat("\nReference ANOVA\n")
-            # print(RANOVA)
-            # cat("\nGeometric mean reference\n")
-            # print(exp(x.barR))
-            # cat("\nGeometric mean test\n")
-            # print(exp(x.barT))
-            # cat("\nRatio of Geom Means (T/R)\n")
-            # print(exp(x.barT)/ exp(x.barR))
             cat("~~~~~~~~~~~~~~~~Referenced Scaled Approach as SigmaR > 0.1~~~~~~~~~~~~~~\n")
             print(kable(result1, digits=12))
             cat("\n")
@@ -301,16 +291,6 @@ bioequiv<- function(foo1=d , nrXlr=10*3, mr=2, ntXlt=10*3, mt=3,
             if (Hmu2 < 0) {accept="PASS"} else {accept="FAIL"} 
             result2 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQc, Hmu2, accept))
             names(result2) <- c("Total SD Reference", " FDA constant", " linearized const. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
-            # cat("\nTest ANOVA\n")
-            # print(TANOVA)
-            # cat("\nReference ANOVA\n")
-            # print(RANOVA)
-            # cat("\nGeometric mean reference\n")
-            # print(exp(x.barR))
-            # cat("\nGeometric mean test\n")
-            # print(exp(x.barT))
-            # cat("\nRatio of Geom Means (T/R)\n")
-            # print(exp(x.barT)/ exp(x.barR))
             cat("~~~~~~~~~~~~~~~~Constant Scaled Approach as SigmaR <= 0.1~~~~~~~~~~~~~~\n")
             print(kable(result2, digits=12))
             cat("\n")
@@ -504,16 +484,6 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
             if (Hmu1 < 0) {accept="PASS"} else {accept="FAIL"}
             result1 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQ, Hmu1, accept))
             names(result1) <- c("Total SD Reference", " FDA constant", " linearized ref. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
-            # cat("\nTest ANOVA\n")
-            # print(TANOVA)
-            # cat("\nReference ANOVA\n")
-            # print(RANOVA)
-            # cat("\nGeometric mean reference\n")
-            # print(exp(x.barR))
-            # cat("\nGeometric mean test\n")
-            # print(exp(x.barT))
-            # cat("\nRatio of Geom Means (T/R)\n")
-            # print(exp(x.barT)/ exp(x.barR))
             cat("~~~~~~~~~~~~~~~~Referenced Scaled Approach as SigmaR > 0.1~~~~~~~~~~~~~~\n")
             print(kable(result1, digits=12))
             cat("\n")
@@ -523,16 +493,6 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
             if (Hmu2 < 0) {accept="PASS"} else {accept="FAIL"} 
             result2 <- as.data.frame(cbind(SIGMAR, sigma_TO, EQc, Hmu2, accept))
             names(result2) <- c("Total SD Reference", " FDA constant", " linearized const. scale point estimate", " upper 95% conf bound", " upper 95% conf bound <0?")
-            # cat("\nTest ANOVA\n")
-            # print(TANOVA)
-            # cat("\nReference ANOVA\n")
-            # print(RANOVA)
-            # cat("\nGeometric mean reference\n")
-            # print(exp(x.barR))
-            # cat("\nGeometric mean test\n")
-            # print(exp(x.barT))
-            # cat("\nRatio of Geom Means (T/R)\n")
-            # print(exp(x.barT)/ exp(x.barR))
             cat("~~~~~~~~~~~~~~~~Constant Scaled Approach as SigmaR <= 0.1~~~~~~~~~~~~~~\n")
             print(kable(result2, digits=12))
             cat("\n")
@@ -545,7 +505,6 @@ bioequiv.1.rep<- function(foo1=d , nrXlr=10*3, mr=1, ntXlt=10*3, mt=1,
     
 }
 
- 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # end rep1 function
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -776,7 +735,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                      tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda", "FDA example data set in guidance [1]"),
                                      div(p(" ")),
                                      
-                                     tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda%20B%20rep%20only", "The same FDA data set with only 1 rep per cannister"),
+                                     tags$a(href = "https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda%20B%20rep%20only", "The same FDA data set with only 1 rep per canister"),
                                      div(p(" ")),
                           
                                      sidebarLayout(
@@ -1093,12 +1052,12 @@ server <- shinyServer(function(input, output) {
         residual <- input$d
         
         # random effects
-        top.r <-    rnorm(top,          d,                a)    # 6
-        middle.r <- rnorm(sum(middle),  0,                b)    # 43 middle random effects
-        lower.r <-  rnorm(sum(lower),   0,                c)    # 739
+        top.r <-    rnorm(top,          d,                a)    
+        middle.r <- rnorm(sum(middle),  0,                b)    
+        lower.r <-  rnorm(sum(lower),   0,                c)    
         
         # ids
-        lower.id <- rep(seq_len(sum(lower)), replicates )       # expand lower (1:723) by replicates 
+        lower.id <- rep(seq_len(sum(lower)), replicates )       
         middle.id <- cut(lower.id, c(0,cumsum(lower)),  labels=FALSE)
         top.id   <- cut(middle.id, c(0,cumsum(middle)), labels=FALSE)
         
@@ -1356,7 +1315,6 @@ server <- shinyServer(function(input, output) {
                 fit.res <- NULL
                 
             }
-            
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
         }
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1375,8 +1333,6 @@ server <- shinyServer(function(input, output) {
                     esigma=esigma, fit.res=fit.res, fit.summary=fit.summary))
         
     })     
-    
-    
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     # plot fda data
@@ -1412,7 +1368,6 @@ server <- shinyServer(function(input, output) {
             
         } else {
             
-            
             # VCA plot~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
             varPlot(y~PRODUCT/BATCH/SECTOR/REP, d1, 
@@ -1441,7 +1396,6 @@ server <- shinyServer(function(input, output) {
         
     })
     
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # execute PBE data analysis on simulation
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1463,7 +1417,6 @@ server <- shinyServer(function(input, output) {
                         response="y",indep="low", split="top", ref="REF", test="TEST")
         
         return(list(res=res))
-        
         
     })
     
@@ -1591,8 +1544,7 @@ server <- shinyServer(function(input, output) {
             
             return(df)
         } 
-        
-        
+
     })
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1638,7 +1590,6 @@ server <- shinyServer(function(input, output) {
                                                    ntXlt=ntXlt, mt=mt,
                                response="y",indep="SECTOR", split="PRODUCT", ref="REF", test="TEST")
                
-                
             } else {
             
             user.analysis<- bioequiv(foo1=df , 
@@ -1648,11 +1599,6 @@ server <- shinyServer(function(input, output) {
             
             }
         }})
-    
-    
-
-    
-    
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # analyse on user data, variance components for plot title
@@ -1678,15 +1624,13 @@ server <- shinyServer(function(input, output) {
         x <- unique(x)
         nrXlr <- sum(as.vector(table(x$BATCH)))
         
-        
         x <- TEST[,c(1,2)]
         x <- unique(x)
         ntXlt <- sum(as.vector(table(x$BATCH)))
         
         ##new 
         if(mr ==1 & mt==1) {
-            
-            
+
             #   df$y <- log(df$y)  # log the fda data
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             # Conditionally fit the model
@@ -1745,7 +1689,6 @@ server <- shinyServer(function(input, output) {
                     fit.res <- NULL
                     
                 }
-                
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
             }
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1789,7 +1732,6 @@ server <- shinyServer(function(input, output) {
             o <- fit.res<- tryCatch(fitVCA(y~PRODUCT/BATCH/SECTOR, df, "reml"), 
                                     error=function(e) e) 
             
-            
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
             if (!inherits(fit.res, "error")) {
                 
@@ -1811,17 +1753,12 @@ server <- shinyServer(function(input, output) {
                 fit.res <- NULL
                 
             }
-            
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
         }
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         }  # end
-            
-      
-            
-            
-            
+
         ##new 
         if(mr ==1 & mt==1) { 
             
@@ -1838,9 +1775,7 @@ server <- shinyServer(function(input, output) {
         return(list(emu=emu, etop=etop, eday=eday, #erun=NA,
                     esigma=esigma, fit.res=fit.res, fit.summary=fit.summary))
             
-            
         } else {
-            
             
             if (is.null(fit.res)) {
                 
@@ -1856,10 +1791,7 @@ server <- shinyServer(function(input, output) {
            
         }  
             
-            
     })     
-    
-    
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # plotting user uploaded data
@@ -1887,7 +1819,6 @@ server <- shinyServer(function(input, output) {
             x <- unique(x)
             nrXlr <- sum(as.vector(table(x$BATCH)))
             
-            
             x <- TEST[,c(1,2)]
             x <- unique(x)
             ntXlt <- sum(as.vector(table(x$BATCH)))
@@ -1896,7 +1827,6 @@ server <- shinyServer(function(input, output) {
             if(mr ==1 & mt==1) {
             # df$y <- log(df$y)  # log the fda data
             
-                
                 varPlot(y~PRODUCT/BATCH/SECTOR/REP, df, 
                         BG=list(var="PRODUCT", 
                                 col=c("#f7fcfd","#e5f5f9","#ccece6","#99d8c9",
@@ -1915,13 +1845,7 @@ server <- shinyServer(function(input, output) {
                         Points=list(pch=list(var="BATCH", pch=c(21, 22, 24)), 
                                     bg =list(var="BATCH", bg=c("lightblue", "cyan", "yellow")), 
                                     cex=1.25)) 
-                
-                
-                
-                
            }  else {   
-               
-               
                
                varPlot(y~PRODUCT/BATCH/SECTOR/REP, df, 
                        BG=list(var="PRODUCT", 
@@ -1941,8 +1865,6 @@ server <- shinyServer(function(input, output) {
                        Points=list(pch=list(var="BATCH", pch=c(21, 22, 24)), 
                                    bg =list(var="BATCH", bg=c("lightblue", "cyan", "yellow")), 
                                    cex=1.25)) 
-               
-               
             }
             
         }  
