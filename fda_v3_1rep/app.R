@@ -665,13 +665,10 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                                             sliderInput("intercept",
                                                                         "True intercept",
                                                                         min=0, max=1000, step=.5, value=700, ticks=FALSE)),
-                                                     
                                                      column(4,
-                                                            sliderInput("d",
-                                                                        "True error",
+                                                            sliderInput("a",
+                                                                        "True top level SD",
                                                                         min=1, max=100, step=.5, value=75, ticks=FALSE))
-                                                     
-                                                     
                                                  ),
                                                  
                                                  fluidRow(
@@ -684,10 +681,10 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                                                         "True lower level SD",
                                                                         min=1, max=100, step=.5, value=1, ticks=FALSE)),
                                                      column(4,
-                                                            sliderInput("a",
-                                                                        "True top level SD",
+                                                            sliderInput("d",
+                                                                        "True error",
                                                                         min=1, max=100, step=.5, value=75, ticks=FALSE))
-                                                     
+
                                                  )
                                              )
               
