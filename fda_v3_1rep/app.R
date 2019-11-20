@@ -532,7 +532,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                         choices=c("VCA package" , "nlme package")),
                             
                             br(),br(),
-                            div(strong("Tab 1a Plot the FDA example guidance data")),p("The example FDA dataset is plotted (always plot data), variance components are estimated for non subsetted data, just for interest."),
+                            div(strong("Tab 1a Plot the FDA example guidance data")),p("The example FDA dataset is plotted (always plot data), variance components are estimated for non subsetted data, just for interest. Note the replicates are linked, replicates labelled B, M and E have a specific meaning and cannot be ignored."),
                             div(strong("Tab 1b FDA Population Bioequivalence Statistical Analysis")),p("Reproduces the FDA analysis as presented in the guidance, notice differences in decimal places."),
                             div(strong("Tab 1c List the FDA guidance example data")),p("A simple listing of the FDA example data."),
                             tags$hr(),
