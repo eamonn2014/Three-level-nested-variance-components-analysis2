@@ -68,13 +68,13 @@ So we actually estimate 4 components counting the residual error. Create a balan
                         "Number of levels of top component (demarked by blue or thick lines)",
                         min=2, max=100, step=1, value=4, ticks=FALSE),
             
-            sliderInput("range1", "Middle level: randomly select no of 'mid' groups within each top level group:", 
+            sliderInput("range1", "Middle level: Randomly select using range or precisely select no of 'mid' groups within each top level group:", 
                         min = 2, max = 10, value = c(2, 10), ticks=FALSE) ,
             
-            sliderInput("range2", "Lower level: Randomly select\n no of 'low' groups within each mid level group:",
+            sliderInput("range2", "Lower level: Randomly select using range or precisely select no of 'low' groups within each mid level group:",
                         min = 2, max = 10, value = c(5, 10),ticks=FALSE),
         
-            sliderInput("replicates", "Randomly select no of replicates nested within each boxplot",
+            sliderInput("replicates", "Randomly select using range or precisely select no of replicates",
                         min = 2, max = 50, value = c(3, 10), ticks=FALSE),
             
             sliderInput("a",
