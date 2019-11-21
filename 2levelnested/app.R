@@ -49,7 +49,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                   The middle, lowest and replicate numbers are varied randomly based on the slider ranges. The variance components are between blue 'top' groups,
 between green 'mid' groups (within blue groups), within green 'mid' groups, within 'low' groups (replicates), aka repeatability. 
 So we actually estimate 4 components counting the residual error. Create a balanced design by reducing all the sliders to one value.
-                  You also have the choices of simulating a new sample. ")),
+                  You also have the choice of simulating a new sample. ")),
 
         
             br(),
