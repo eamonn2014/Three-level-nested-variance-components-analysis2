@@ -8,7 +8,7 @@ fig.width <- 1200
 fig.height <- 450
 library(shinythemes)        # more funky looking apps
 p1 <- function(x) {formatC(x, format="f", digits=1)}
-
+options(width=100)
 
 
 
