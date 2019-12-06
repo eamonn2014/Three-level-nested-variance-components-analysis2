@@ -833,7 +833,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                          helpText('This is equal to $${{}\\sigma_R ={\\sqrt{\\frac{MSB_R-MSW_R}{m} + MSW_R}}}\\!$$ In the event that $$MSB_R < MSW_R$$then $$MSB_R - MSW_R < 0$$and 
                                          therefore $$\\sigma_R <  {\\sqrt{MSW_R}}$$
                               This means the total variance is less than the within variance component which cannot be.
-                                                  If this is encountered the the total variance is set equal to the within variance component. 
+                                                  If this is encountered the total variance is set equal to the within variance component. 
                                                   For either or both reference or test product if necessary. This is the first change from the guidance.')),
                                      
                                      withMathJax(
