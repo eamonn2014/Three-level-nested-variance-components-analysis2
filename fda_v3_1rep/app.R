@@ -552,7 +552,7 @@ ui <- fluidPage(theme = shinytheme("journal"),
                             br(),
                             actionButton(inputId='ab1', label="R code here", 
                                          icon = icon("th"), 
-                                         onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis/master/three-level-nested-variance-components-analysis/app.R', '_blank')"),
+                                         onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/Three-level-nested-variance-components-analysis2/master/fda_v3_1rep/app.R', '_blank')"),
                             
                             br(),
                             br(),
